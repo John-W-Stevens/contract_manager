@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+
+    {% load static %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+
+    <!-- Custom CSS stylesheet-->
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
+    <style>
+      .content {
+        margin-top: 100px;
+      }
+      .error_message {
+        color: red;
+      }
+    </style>
+
+    <title>Sign in</title>
+
+  </head>
+  
+  <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand" href="/">Contract Manager</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      {% if request.session.user_id == None %}
+        <a class="navbar-nav mr-auto nav-link disabled" href="/users"></a>
+        <a class="navbar-nav mr-lg-2 nav-link" href="/login">Signin</a>
+      {% else %}
+        <a class="navbar-nav mr-auto nav-link" href="/dashboard">Dashboard</a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="#">{{user.first_name}} {{user.last_name}} (admin)</a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="/logout">Logoff</a>
+      {% endif %}
+      </div>
+    </nav>
+    
+    <div class="container">
+        <div class="row content">
+          <div class="col-6 offset-3 col-lg-4 offset-lg-4">
+            <h1>Sign In</h1>
+            <form action="/login" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label>Email Address:</label>
+                {% if errors.email %}
+                &nbsp&nbsp<small class="error_message">{{ errors.email }}</small>
+                {% endif %}
+                <input type="text" class="form-control" name="email" id="email_input">
+              </div>
+              <div class="form-group">
+                <label>Password:</label>
+                {% if errors.password %}
+                &nbsp&nbsp<small class="error_message">{{ errors.password }}</small>
+                {% endif %}
+                <input type="password" class="form-control" name="password" id="pw_input">
+              </div>
+              {% if user != 'none' %}
+              <div class="form-group text-center">
+                <p>{{user.first_name}} {{user.last_name}} is already signed in</p>
+              </div>
+              {% else %}
+              <div class="form-group text-right">
+                <button class="btn btn-md btn-success">Sign In</button>
+              </div>
+              {% endif %}
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 offset-3 col-lg-4 offset-lg-4 text-center">
+            {% if user == "none" %}
+            <a href="/registration">Don't have an account? Register</a>
+            {% endif %}
+          </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      
+    <!-- bootstrap.js-->
+    <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+
+    <!-- Custom JavaScript -->
+    <!-- <script type="text/javascript" src="{% static 'login.js' %}"></script> -->
+
+  </body>
+</html>

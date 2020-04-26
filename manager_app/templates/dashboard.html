@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+
+    {% load static %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+
+    <!-- Custom CSS stylesheet-->
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
+
+    <title>Dashboard</title>
+
+    <style>
+      .top_row {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .table_nav {
+        margin-bottom: 5px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+     <!-- Navbar -->
+     <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand" href="/">Contract Manager</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      {% if request.session.user_id == None %}
+        <a class="navbar-nav mr-auto nav-link disabled" href="/users"></a>
+        <a class="navbar-nav mr-lg-2 nav-link" href="/login">Signin</a>
+      {% else %}
+        <a class="navbar-nav mr-auto nav-link" href="#"></a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="#">{{user.first_name}} {{user.last_name}} (admin)</a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="/logout">Logoff</a>
+      {% endif %}
+      </div>
+    </nav>
+  
+    <!-- Container -->
+    <div class="container">
+
+      <div class="row top_row">
+        <div class="col-4">
+          <h3>Dashboard</h3>
+       </div>
+       <div class="col-8 text-right">
+         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Contract</button>
+         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Customer</button>
+         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Carrier</button>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col-12 table_nav">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="true">Contracts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#carriers" role="tab" aria-controls="carriers" aria-selected="false">Carriers</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#customers" role="tab" aria-controls="customers" aria-selected="false">Customers</a>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="contracts" role="tabpanel" aria-labelledby="home-tab">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+              <thead class ="thead-light">
+                <tr>
+                  <th>Contract Id</th>
+                  <th>Carrier</th>
+                  <th>Customer</th>
+                  <th>Deliver By</th>
+                  <th>Status</th>
+                  <th>Route</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><a href="#">ABC Shipping</a></td>
+                  <td><a href="#">XYZ Cosmetics</a></td>
+                  <td>05/23/20</td>
+                  <td>
+                    <form action="/dashboard" method="post">
+                      {% csrf_token%}
+                      <select>
+                        <option>On time</option>
+                        <option>Delivered</option>
+                        <option>Delayed</option>
+                        <option>Canceled</option>
+                      </select>
+                      <input type="hidden" name="status" value="contract_id">
+                      <!-- submit this form via jquery, just update database -->
+                    </form>
+                  </td>
+                  <td><a href="#">SEA to LA</a></td>
+                  <td>
+                    <a href="#">View</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><a href="#">123 Shipping</a></td>
+                  <td><a href="#">456 Aerospace Solutions</a></td>
+                  <td>05/16/20</td>
+                  <td>
+                    <form action="/dashboard" method="post">
+                      {% csrf_token%}
+                      <select>
+                        <option>On time</option>
+                        <option>Delivered</option>
+                        <option>Delayed</option>
+                        <option>Canceled</option>
+                      </select>
+                      <input type="hidden" name="status" value="contract_id">
+                      <!-- submit this form via jquery, just update database -->
+                    </form>
+                  </td>
+                  <td><a href="#">SEA to BAL</a></td>
+                  <td>
+                    <a href="#">View</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><a href="#">ABC Shipping</a></td>
+                  <td><a href="#">Waffles R Us</a></td>
+                  <td>05/30/20</td>
+                  <td>
+                    <form action="/dashboard" method="post">
+                      {% csrf_token%}
+                      <select>
+                        <option>On time</option>
+                        <option>Delivered</option>
+                        <option>Delayed</option>
+                        <option>Canceled</option>
+                      </select>
+                      <input type="hidden" name="status" value="contract_id">
+                      <!-- submit this form via jquery, just update database -->
+                    </form>
+                  </td>
+                  <td><a href="#">SEA to Chicago</a></td>
+                  <td>
+                    <a href="#">View</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-pane fade" id="carriers" role="tabpanel" aria-labelledby="profile-tab">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+              <thead class ="thead-light">
+                <tr>
+                  <th>Carrier</th>
+                  <th>Open Contracts</th>
+                  <th>Completed Contracts</th>
+                  <th>Rep</th>
+                  <th>Contact</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="#">ABC Shipping</a></td>
+                  <td>3</td>
+                  <td>2</td>
+                  <td>Sally Wells</td>
+                  <td>(425) 123-4567</td>
+                  <td>
+                    <a href="#">update</a>&nbsp|
+                    <a href="#">remove</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td><a href="#">123 Shipping</a></td>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>Bob Wallace</td>
+                  <td>(206) 987-6543</td>
+                  <td>
+                    <a href="#">update</a>&nbsp|
+                    <a href="#">remove</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-pane fade" id="customers" role="tabpanel" aria-labelledby="contact-tab">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+              <thead class ="thead-light">
+                <tr>
+                  <th>Customer</th>
+                  <th>Open Contracts</th>
+                  <th>Completed Contracts</th>
+                  <th>Rep</th>
+                  <th>Contact</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="#">XYZ Cosmetics</a></td>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>Andy Daniels</td>
+                  <td>(425) 123-4567</td>
+                  <td>
+                    <a href="#">update</a>&nbsp|
+                    <a href="#">remove</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td><a href="#">456 Aerospace Solutions</a></td>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>Tad Johnson</td>
+                  <td>(206) 987-6543</td>
+                  <td>
+                    <a href="#">update</a>&nbsp|
+                    <a href="#">remove</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td><a href="#"></a>Waffles R Us</a></td>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>Bill Henderson</td>
+                  <td>(206) 987-6543</td>
+                  <td>
+                    <a href="#">update</a>&nbsp|
+                    <a href="#">remove</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+  
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      
+    <!-- bootstrap.js-->
+    <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+
+    <!-- Custom JavaScript -->
+    <!-- <script type="text/javascript" src="script.js"></script> -->
+
+  </body>
+</html>
