@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
     {% load static %}
+
+    
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="{% static 'dataTables.bootstrap4.min.css' %}">
 
     <!-- Custom CSS stylesheet-->
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
@@ -37,7 +41,12 @@
       .time_input {
         border: 1px solid grey !important;
       }
-
+      #myTab {
+        margin-bottom: 10px;
+      }
+      /* .table_header { */
+        /* margin-bottom: 10px; */
+      /* } */
     </style>
 
   </head>
@@ -94,7 +103,7 @@
           
           <!-- Contracts Table -->
           <div class="tab-pane fade show active" id="contracts" role="tabpanel" aria-labelledby="home-tab">
-            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contracts_datatable">
               <thead class ="thead-light">
                 <tr>
                   <th>Contract Id</th>
@@ -119,8 +128,9 @@
           </div>
           
           <!-- Carriers Table -->
-          <div class="tab-pane fade" id="carriers" role="tabpanel" aria-labelledby="profile-tab">
-            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+          <div class="tab-pane fade table-header" id="carriers" role="tabpanel" aria-labelledby="profile-tab">
+
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="carriers_datatable">
               <thead class ="thead-light">
                 <tr>
                   <th>Carrier</th>
@@ -146,7 +156,7 @@
 
           <!-- Customers Table -->
           <div class="tab-pane fade" id="customers" role="tabpanel" aria-labelledby="contact-tab">
-            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="customers_datatable">
               <thead class ="thead-light">
                 <tr>
                   <th>Customer</th>
@@ -208,7 +218,7 @@
                         </div>
                         <div class="col-2">
                           <label>State:</label>
-                          <select class="form-control" id="state" name="state">
+                          <select class="form-control" name="state">
                             <option value="">N/A</option>
                             <option value="AK">Alaska</option>
                             <option value="AL">Alabama</option>
@@ -722,6 +732,8 @@
     <!-- bootstrap.js-->
     <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
 
+    <script src="{% static 'jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'dataTables.bootstrap4.min.js' %}"></script>
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
 
@@ -762,5 +774,18 @@
           uiLibrary: 'bootstrap4'
       });
     </script>
+
+    <script>
+      $(document).ready(function() {
+        $("#contracts_datatable").DataTable();
+        $("#carriers_datatable").DataTable();
+        $("#customers_datatable").DataTable();
+      });
+    </script>
+
+    <script>
+      $("#example_filter").addClass("text-right")
+    </script>
+
   </body>
 </html>
