@@ -29,7 +29,172 @@ def logged_user(request):
 ####### Helper Functions #########
 
 def index(request):
-    context = {
-        "user": logged_user(request)
-    }
-    return render(request, "dashboard.html", context)
+    """
+    GET -> Renders dashboard.html
+    POST -> Handles the following requests:
+      a. Create Customer
+      b. Create Carrier
+      c. Create Contract
+    """
+    #### HELPER FUNCTION #####
+    def format_datetime_input(astring):
+        output = astring.split("/")
+        output.append(output[0])
+        output.append(output[1])
+        output = output[2::]
+        return "-".join(output)
+
+    # POST Request ->
+    if request.POST:
+        display_post(request)
+        try:
+            request.POST["add_carrier"]
+            carrier_address = models.Address.objects.create(
+                name=request.POST["name"],
+                street=request.POST["street_address"],
+                city=request.POST["city"],
+                state=request.POST["state"],
+                zip_code=request.POST["zip_code"]
+            )
+
+            carrier = models.Carrier.objects.create(
+                name = request.POST["name"],
+                website = request.POST["website"],
+                email = request.POST["email"],
+                address = carrier_address
+            )
+
+            carrier_phone_number = models.PhoneNumber.objects.create(
+                number_type = request.POST["number_type"],
+                number = request.POST["phone_number"],
+                carrier = carrier
+            )
+
+            comment = models.Comment.objects.create(
+                content = request.POST["content"],
+                user = logged_user(request),
+                carrier = carrier,
+            )
+            
+            carrier.save()
+            carrier_address.save()
+            carrier_phone_number.save()
+            comment.save()
+
+            print("Customer successfully entered into the database")
+            return redirect(f"/dashboard/carrier/{carrier.id}")
+
+        except KeyError:
+            pass
+
+        try:
+            request.POST["add_customer"]
+            customer_address = models.Address.objects.create(
+                name=request.POST["name"],
+                street=request.POST["street_address"],
+                city=request.POST["city"],
+                state=request.POST["state"],
+                zip_code=request.POST["zip_code"]
+            )
+
+            customer = models.Customer.objects.create(
+                name = request.POST["name"],
+                website = request.POST["website"],
+                email = request.POST["email"],
+                address = customer_address
+            )
+
+            customer_phone_number = models.PhoneNumber.objects.create(
+                number_type = request.POST["number_type"],
+                number = request.POST["phone_number"],
+                customer = customer
+            )
+
+            comment = models.Comment.objects.create(
+                content = request.POST["content"],
+                user = logged_user(request),
+                customer = customer,
+            )
+            
+            customer.save()
+            customer_address.save()
+            customer_phone_number.save()
+            comment.save()
+
+            print("Customer successfully entered into the database")
+            return redirect(f"/dashboard/customer/{customer.id}")
+
+        except KeyError:
+            pass
+
+        try:
+            request.POST["add_contract"]
+            pick_up_address = models.Address.objects.create(
+                name = "Pickup address",
+                street = request.POST["pickup_street_address"],
+                city = request.POST["pickup_city"],
+                state = request.POST["pickup_state"],
+                zip_code = request.POST["pickup_zip_code"]    
+            )
+            delivery_address = models.Address.objects.create(
+                name = "Delivery address",
+                street = request.POST["delivery_street_address"],
+                city = request.POST["delivery_city"],
+                state = request.POST["delivery_state"],
+                zip_code = request.POST["delivery_zip_code"] 
+            )
+            customer = models.Customer.objects.filter(name=request.POST["customer"])[0]
+            carrier = models.Carrier.objects.filter(name=request.POST["carrier"])[0]
+            contract = models.Contract.objects.create(
+                status = request.POST["status"],
+                customer = customer,
+                carrier = carrier,
+                customer_price = request.POST["customer_cost"],
+                carrier_cost = request.POST["carrier_cost"],
+                pick_up_time = format_datetime_input(request.POST["pickup_date"]) + " " + str(request.POST["pickup_time"]),
+                delivery_time = format_datetime_input(request.POST["delivery_date"]) + " " + str(request.POST["delivery_time"])
+            )
+            comment = models.Comment.objects.create(
+                content = request.POST["comments"],
+                user = logged_user(request),
+                contract = contract
+            )
+            route = models.Route.objects.create(
+                start = pick_up_address,
+                end = delivery_address,
+                contract = contract
+            )
+
+            contract.save()
+            comment.save()
+            route.save()
+            pick_up_address.save()
+            delivery_address.save()
+            print("Contract successfully added to the database")
+            return redirect(f"/dashboard/contract/{contract.id}")
+
+        except KeyError:
+            pass
+
+        return redirect("/dashboard")
+    
+    
+    # GET Request -> Render dashboard.html
+    else:
+        context = {
+            "user": logged_user(request),
+            "carriers": models.Carrier.objects.all(),
+            "customers": models.Customer.objects.all(),
+            "contracts": models.Contract.objects.all(),
+        }
+        
+        return render(request, "dashboard.html", context)
+
+def carrier(request, carrier_id):
+    pass
+
+def contract(request, contract_id):
+    pass
+
+def customer(request, customer_id):
+    pass

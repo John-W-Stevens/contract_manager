@@ -23,6 +23,21 @@
       .table_nav {
         margin-bottom: 5px;
       }
+
+      .modal_comments {
+        min-height: 150px;
+        max-height: 200px;
+        overflow: auto;
+      }
+
+      .contract_modal_mid_header {
+        margin-top: 10px;
+      }
+
+      .time_input {
+        border: 1px solid grey !important;
+      }
+
     </style>
 
   </head>
@@ -53,16 +68,16 @@
       <div class="row top_row">
         <div class="col-4">
           <h3>Dashboard</h3>
-       </div>
-       <div class="col-8 text-right">
-         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Contract</button>
-         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Customer</button>
-         <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Carrier</button>
         </div>
+        <div class="col-8 text-right">
+         <!-- <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Contract</button> -->
+         <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_contract">Add Contract</button>
+         <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_customer">Add Customer</button>
+         <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_carrier">Add Carrier</button>
+       </div>
       </div>
-    <div class="row">
+     <div class="row">
       <div class="col-12 table_nav">
-
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item">
             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="true">Contracts</a>
@@ -76,6 +91,8 @@
         </ul>
 
         <div class="tab-content" id="myTabContent">
+          
+          <!-- Contracts Table -->
           <div class="tab-pane fade show active" id="contracts" role="tabpanel" aria-labelledby="home-tab">
             <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
               <thead class ="thead-light">
@@ -85,175 +102,615 @@
                   <th>Customer</th>
                   <th>Deliver By</th>
                   <th>Status</th>
-                  <th>Route</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
+                {% for contract in contracts %}
                 <tr>
-                  <td>1</td>
-                  <td><a href="#">ABC Shipping</a></td>
-                  <td><a href="#">XYZ Cosmetics</a></td>
-                  <td>05/23/20</td>
-                  <td>
-                    <form action="/dashboard" method="post">
-                      {% csrf_token%}
-                      <select>
-                        <option>On time</option>
-                        <option>Delivered</option>
-                        <option>Delayed</option>
-                        <option>Canceled</option>
-                      </select>
-                      <input type="hidden" name="status" value="contract_id">
-                      <!-- submit this form via jquery, just update database -->
-                    </form>
-                  </td>
-                  <td><a href="#">SEA to LA</a></td>
-                  <td>
-                    <a href="#">View</a>
-                  </td>
+                  <td><a href="/dashboard/contract/{{ contract.id }}">{{contract.id}}</a></td>
+                  <td><a href="/dashboard/carrier/{{ contract.carrier.id }}">{{contract.carrier.name}}</a></td>
+                  <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
+                  <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
+                  <td>{{contract.status}}</td>
                 </tr>
-                <tr>
-                  <td>2</td>
-                  <td><a href="#">123 Shipping</a></td>
-                  <td><a href="#">456 Aerospace Solutions</a></td>
-                  <td>05/16/20</td>
-                  <td>
-                    <form action="/dashboard" method="post">
-                      {% csrf_token%}
-                      <select>
-                        <option>On time</option>
-                        <option>Delivered</option>
-                        <option>Delayed</option>
-                        <option>Canceled</option>
-                      </select>
-                      <input type="hidden" name="status" value="contract_id">
-                      <!-- submit this form via jquery, just update database -->
-                    </form>
-                  </td>
-                  <td><a href="#">SEA to BAL</a></td>
-                  <td>
-                    <a href="#">View</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td><a href="#">ABC Shipping</a></td>
-                  <td><a href="#">Waffles R Us</a></td>
-                  <td>05/30/20</td>
-                  <td>
-                    <form action="/dashboard" method="post">
-                      {% csrf_token%}
-                      <select>
-                        <option>On time</option>
-                        <option>Delivered</option>
-                        <option>Delayed</option>
-                        <option>Canceled</option>
-                      </select>
-                      <input type="hidden" name="status" value="contract_id">
-                      <!-- submit this form via jquery, just update database -->
-                    </form>
-                  </td>
-                  <td><a href="#">SEA to Chicago</a></td>
-                  <td>
-                    <a href="#">View</a>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
+          
+          <!-- Carriers Table -->
           <div class="tab-pane fade" id="carriers" role="tabpanel" aria-labelledby="profile-tab">
             <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
               <thead class ="thead-light">
                 <tr>
                   <th>Carrier</th>
                   <th>Open Contracts</th>
-                  <th>Completed Contracts</th>
-                  <th>Rep</th>
+                  <th>Completed</th>
+                  <th>Address</th>
                   <th>Contact</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
+                {% for carrier in carriers %}
                 <tr>
-                  <td><a href="#">ABC Shipping</a></td>
-                  <td>3</td>
-                  <td>2</td>
-                  <td>Sally Wells</td>
-                  <td>(425) 123-4567</td>
-                  <td>
-                    <a href="#">update</a>&nbsp|
-                    <a href="#">remove</a>
-                  </td>
+                  <td><a href="/dashboard/carrier/{{carrier.id}}">{{ carrier.name }}</a></td>
+                  <td>{{ carrier.open_contracts }}</td>
+                  <td>{{ carrier.completed_contracts }}</td>
+                  <td>{{ carrier.address.street }}, {{ carrier.address.city }} {{ carrier.address.state }}, {{ carrier.address.zip_code }}</td>
+                  <td>{{ carrier.phone_numbers.first.number }}</td>
                 </tr>
-                <tr>
-                  <td><a href="#">123 Shipping</a></td>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>Bob Wallace</td>
-                  <td>(206) 987-6543</td>
-                  <td>
-                    <a href="#">update</a>&nbsp|
-                    <a href="#">remove</a>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
+
+          <!-- Customers Table -->
           <div class="tab-pane fade" id="customers" role="tabpanel" aria-labelledby="contact-tab">
             <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg">
               <thead class ="thead-light">
                 <tr>
                   <th>Customer</th>
                   <th>Open Contracts</th>
-                  <th>Completed Contracts</th>
-                  <th>Rep</th>
+                  <th>Completed</th>
+                  <th>Address</th>
                   <th>Contact</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
+                {% for customer in customers %}
                 <tr>
-                  <td><a href="#">XYZ Cosmetics</a></td>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>Andy Daniels</td>
-                  <td>(425) 123-4567</td>
-                  <td>
-                    <a href="#">update</a>&nbsp|
-                    <a href="#">remove</a>
-                  </td>
+                  <td><a href="/dashboard/customer/{{customer.id}}">{{ customer.name }}</a></td>
+                  <td>{{ customer.open_contracts }}</td>
+                  <td>{{ customer.completed_contracts }}</td>
+                  <td>{{ customer.address.street }}, {{ customer.address.city }} {{ customer.address.state }}, {{ customer.address.zip_code }}</td>
+                  <td>{{ customer.phone_numbers.first.number }}</td>
                 </tr>
-                <tr>
-                  <td><a href="#">456 Aerospace Solutions</a></td>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>Tad Johnson</td>
-                  <td>(206) 987-6543</td>
-                  <td>
-                    <a href="#">update</a>&nbsp|
-                    <a href="#">remove</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td><a href="#"></a>Waffles R Us</a></td>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>Bill Henderson</td>
-                  <td>(206) 987-6543</td>
-                  <td>
-                    <a href="#">update</a>&nbsp|
-                    <a href="#">remove</a>
-                  </td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
+        
         </div>
 
+              <!-- Modal for Creating a Carrier -->
+              <div class="modal fade text-left" id="add_carrier" tabindex="-1" role="dialog" aria-labelledby="add_carrier_modal" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3 class="modal-title" id="add_carrier_modal">Add a Carrier</h3>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form enctype="multipart/form-data" action="/dashboard" method="post" id="add_carrier_form">
+                      {% csrf_token %}
+                      <input type="hidden" name="add_carrier">
+                      <div class="form-group row">
+                        <div class="col-6">
+                          <label>Carrier Name:</label>
+                          <input type="text" name="name" class="form-control">
+                        </div>
+                        <div class="col-6">
+                          <label>Website:</label>
+                          <input type="text" name="website" class="form-control">
+                        </div>  
+                      </div>  
+                      <!-- Address Content -->
+                      <div class="form-group row">
+                        <div class="col-5">
+                          <label>Street Address:</label>
+                          <input type="text" name="street_address" class="form-control">
+                        </div>
+                        <div class="col-3">
+                          <label>City:</label>
+                          <input type="text" name="city" class="form-control">
+                        </div>
+                        <div class="col-2">
+                          <label>State:</label>
+                          <select class="form-control" id="state" name="state">
+                            <option value="">N/A</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DC">District of Columbia</option>
+                            <option value="DE">Delaware</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="IA">Iowa</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MD">Maryland</option>
+                            <option value="ME">Maine</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MT">Montana</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="ND">North Dakota</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NH">New Hampshire</option>
+                            <option value="NJ">New Jersey</option>
+                            <option value="NM">New Mexico</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NY">New York</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="PR">Puerto Rico</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="SD">South Dakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VA">Virginia</option>
+                            <option value="VT">Vermont</option>
+                            <option value="WA">Washington</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WV">West Virginia</option>
+                            <option value="WY">Wyoming</option>
+                          </select>
+                        </div>
+                        <div class="col-2">
+                          <label>Zip Code:</label>
+                          <input type="text" name="zip_code" class="form-control">
+                        </div>
+                      </div>
+                      <!-- Contact Information -->
+                      <div class="form-group row">
+                        <div class="col-6">
+                          <label>Email Address:</label>
+                          <input type="text" name="email" class="form-control">
+                        </div>  
+                        <div class="col-4">
+                          <label>Phone Number:</label>
+                          <input type="text" name="phone_number" class="form-control">
+                        </div>  
+                        <div class="col-2">
+                          <label>Type:</label>
+                          <select name="number_type" class="form-control">
+                            <option>N/A</option>
+                            <option>Office</option>
+                            <option>Cell</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-12">
+                          <label>Comments:</label>
+                          <textarea class="form-control modal_comments" name="comments"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button class="btn btn-primary btn-md" id="add_carrier_button">Add Carrier</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-      </div>
-    </div>
+              <!-- Modal for Creating a Customer -->
+              <div class="modal fade text-left" id="add_customer" tabindex="-1" role="dialog" aria-labelledby="add_customer_modal" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3 class="modal-title" id="add_customer_modal">Add a Customer</h3>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form enctype="multipart/form-data" action="/dashboard" method="post" id="add_customer_form">
+                      {% csrf_token %}
+                      <input type="hidden" name="add_customer">
+                      <div class="form-group row">
+                        <div class="col-6">
+                          <label>Customer Name:</label>
+                          <input type="text" name="name" class="form-control">
+                        </div>
+                        <div class="col-6">
+                          <label>Website:</label>
+                          <input type="text" name="website" class="form-control">
+                        </div>  
+                      </div>  
+                      <!-- Address Content -->
+                      <div class="form-group row">
+                        <div class="col-5">
+                          <label>Street Address:</label>
+                          <input type="text" name="street_address" class="form-control">
+                        </div>
+                        <div class="col-3">
+                          <label>City:</label>
+                          <input type="text" name="city" class="form-control">
+                        </div>
+                        <div class="col-2">
+                          <label>State:</label>
+                          <select class="form-control" id="state" name="state">
+                            <option value="">N/A</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DC">District of Columbia</option>
+                            <option value="DE">Delaware</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="IA">Iowa</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MD">Maryland</option>
+                            <option value="ME">Maine</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MT">Montana</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="ND">North Dakota</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NH">New Hampshire</option>
+                            <option value="NJ">New Jersey</option>
+                            <option value="NM">New Mexico</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NY">New York</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="PR">Puerto Rico</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="SD">South Dakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VA">Virginia</option>
+                            <option value="VT">Vermont</option>
+                            <option value="WA">Washington</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WV">West Virginia</option>
+                            <option value="WY">Wyoming</option>
+                          </select>
+                        </div>
+                        <div class="col-2">
+                          <label>Zip Code:</label>
+                          <input type="text" name="zip_code" class="form-control">
+                        </div>
+                      </div>
+                      <!-- Contact Information -->
+                      <div class="form-group row">
+                        <div class="col-6">
+                          <label>Email Address:</label>
+                          <input type="text" name="email" class="form-control">
+                        </div>  
+                        <div class="col-4">
+                          <label>Phone Number:</label>
+                          <input type="text" name="phone_number" class="form-control">
+                        </div>  
+                        <div class="col-2">
+                          <label>Type:</label>
+                          <select name="number_type" class="form-control">
+                            <option>N/A</option>
+                            <option>Office</option>
+                            <option>Cell</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-12">
+                          <label>Comments:</label>
+                          <textarea class="form-control modal_comments" name="comments"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button class="btn btn-primary btn-md" id="add_customer_button">Add Customer</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal for Creating a Contract -->
+              <div class="modal fade text-left" id="add_contract" tabindex="-1" role="dialog" aria-labelledby="add_contract_modal" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3 class="modal-title" id="add_contract_modal">Add a Contract</h3>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form enctype="multipart/form-data" action="/dashboard" method="post" id="add_contract_form">
+                      {% csrf_token %}
+                      <input type="hidden" name="add_contract">
+                      <div class="form-group row">
+                        <div class="col-6">
+                          <label>Contract Name:</label>
+                          <input type="text" name="contract_name" class="form-control">
+                        </div>
+                        <div class="col-6">
+                          <label>Status:</label>
+                          <select class="form-control" name="status">
+                            <option></option>
+                            <option>open</option>
+                            <option>closed</option>
+                            <option>canceled</option>
+                          </select>
+                        </div>  
+                      </div>
+                      <!-- Select Customer and Carrier -->
+                      <div class="row">
+                        <div class="col-6">
+                          <label>Select Customer</label>
+                          <select class="form-control" name="customer">
+                            <option></option>
+                            {% for customer in customers %}
+                            <option>{{customer.name}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+
+                        <div class="col-6">
+                          <label>Select Carrier</label>
+                          <select class="form-control" name="carrier">
+                            <option></option>
+                            {% for carrier in carriers %}
+                            <option>{{carrier.name}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="row contract_modal_mid_header">
+                        <div class="col-6">
+                          <label>Customer Price:</label>
+                          <input type="text" name="customer_cost" class="form-control">
+                        </div>
+                        <div class="col-6">
+                          <label>Carrier Cost:</label>
+                          <input type="text" name="carrier_cost" class="form-control">
+                        </div>
+                      </div>
+
+                      <div class="row contract_modal_mid_header">
+                        <div class="col-6">
+                          <div class="row">
+                            <div class="col-12 text-center">
+                              <h4>Pickup Details</h4>
+
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="col-6">
+                              <label>Pickup Date</label>
+                              <input type="hidden" id="hidden_pickup_date" name="pickup_date">
+                              <input class="form-control" id="pickup_date" value="" type="text" placeholder="mm/dd/yyyy">
+                            </div>
+                            <div class="col-6">
+                                <label>Pickup Time:</label>
+                                <input id="timepicker1" class="form-control time_input" name="pickup_time">
+                            </div>
+                          </div>
+
+                          <div class="row contract_modal_mid_header">
+                            <div class="col-12">
+                              <label>Pickup Address:</label>
+                              <input type="text" name="pickup_street_address" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row contract_modal_mid_header">
+                            <div class="col-5">
+                              <label>City:</label>
+                              <input type="text" class="form-control" name="pickup_city">
+                            </div>
+                            <div class="col-3">
+                              <label>State:</label>
+                              <select class="form-control" id="pickup_state" name="pickup_state">
+                                <option value="">N/A</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DC">District of Columbia</option>
+                                <option value="DE">Delaware</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="IA">Iowa</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MD">Maryland</option>
+                                <option value="ME">Maine</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MT">Montana</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NY">New York</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VA">Virginia</option>
+                                <option value="VT">Vermont</option>
+                                <option value="WA">Washington</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WY">Wyoming</option>
+                              </select>
+                            </div>
+                            <div class="col-4">
+                              <label>Zip:</label>
+                              <input type="text" class="form-control" name="pickup_zip_code">
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-6">
+                          <div class="row">
+                            <div class="col-12 text-center">
+                              <h4>Delivery Details</h4>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-6">
+                              <label>Delivery Date:</label>
+                              <input type="hidden" id="hidden_delivery_date" name="delivery_date">
+                              <input class="form-control" id="delivery_date" value="" type="text" placeholder="mm/dd/yyyy">
+                            </div>
+                            <div class="col-6">
+                              <label>Delivery Time:</label>
+                              <!-- <input type="text" class="form-control" name="delivery_time" placeholder="hh:mm"> -->
+                              <input id="timepicker2" class="form-control time_input" name="delivery_time">
+                            </div>
+                          </div>
+                          <div class="row contract_modal_mid_header">
+                            <div class="col-12 ">
+                              <label>Delivery Address:</label>
+                              <input type="text" name="delivery_street_address" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row contract_modal_mid_header">
+                            <div class="col-5">
+                              <label>City:</label>
+                              <input type="text" class="form-control" name="delivery_city">
+                            </div>
+                            <div class="col-3">
+                              <label>State:</label>
+                              <select class="form-control" id="delivery_state" name="delivery_state">
+                                <option value="">N/A</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DC">District of Columbia</option>
+                                <option value="DE">Delaware</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="IA">Iowa</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MD">Maryland</option>
+                                <option value="ME">Maine</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MT">Montana</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NY">New York</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VA">Virginia</option>
+                                <option value="VT">Vermont</option>
+                                <option value="WA">Washington</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WY">Wyoming</option>
+                              </select>
+                            </div>
+                            <div class="col-4">
+                              <label>Zip:</label>
+                              <input type="text" class="form-control" name="delivery_zip_code">
+                            </div>
+                          </div>
+                        </div>                        
+                      </div>
+                    
+                      <div class="form-group row contract_modal_mid_header">
+                        <div class="col-12">
+                          <label>Comments:</label>
+                          <textarea class="form-control modal_comments" name="comments"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button class="btn btn-primary btn-md" id="add_contract_button">Save Contract</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+  </div>
 
   
     <!-- jQuery -->
@@ -268,5 +725,42 @@
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <script>
+      $(document).ready(function(){
+        $('#pickup_date').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+
+        $(document).on("click","button",function(){
+          $("#hidden_pickup_date").val($("#pickup_date").val())
+        })
+
+        $('#delivery_date').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+        $(document).on("click","button",function(){
+          $("#hidden_delivery_date").val($("#delivery_date").val())
+        })
+
+      })
+    </script>
+
+    <script>
+      $('#timepicker1').timepicker({
+          uiLibrary: 'bootstrap4'
+      });
+    </script>
+
+    <script>
+      $('#timepicker2').timepicker({
+          uiLibrary: 'bootstrap4'
+      });
+    </script>
   </body>
 </html>
