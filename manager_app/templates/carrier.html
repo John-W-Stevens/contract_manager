@@ -46,7 +46,7 @@
         <h4 id='title'>All Carrier Comments</h4>
         <ul id='list'>
             {% for x in carrier.comments.all %}
-            <li>{{ x.content }} - {{ x.created_at }} - {{ x.author.first_name }}</li>
+            <li>{{ x.content }} - {{ x.created_at }} - {{ x.user.first_name }}</li>
             {% endfor %}
         </ul>
     </div>
