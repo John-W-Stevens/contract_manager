@@ -312,7 +312,7 @@ def update_carrier(request):
     if comment =='':
         pass
     else:
-        models.Commment.objects.create(content=comment, author=user, carrier=the_carrier)
+        models.Commment.objects.create(content=comment, user=user, carrier=the_carrier)
     return redirect(f'/dashboard/carrier/{carrier_id}')
 
 
