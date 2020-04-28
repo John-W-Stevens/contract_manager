@@ -1,0 +1,161 @@
+<!-- Ryan does customer page -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+
+    <!-- Custom CSS stylesheet-->
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
+
+    <title>Dashboard</title>
+
+    <style>
+      .top_row {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .table_nav {
+        margin-bottom: 5px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+  <!-- Navbar -->
+     <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand" href="/">Contract Manager</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      {% if request.session.user_id == None %}
+        <a class="navbar-nav mr-auto nav-link disabled" href="/users"></a>
+        <a class="navbar-nav mr-lg-2 nav-link" href="/login">Signin</a>
+      {% else %}
+        <a class="navbar-nav mr-auto nav-link" href="#"></a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="#">{{user.first_name}} {{user.last_name}} (admin)</a>
+        <a class="navbar-nav mr-sm-0 nav-link" href="/logout">Logoff</a>
+      {% endif %}
+      </div>
+    </nav>
+  
+    <!-- Container -->
+    <!-- 3 tasks: Show information, update information, archive information -->
+    <div class="container">
+        <h1>{{customer.name}}</h1>
+        <p>Customer since: {{customer.created_at}}</p>
+        <p>Last edited: {{customer.updated_at}}</p>
+        <h4>Email: {{customer.email}}</h4>
+        <h4>Website: {{customer.website}}</h4>
+        <h4>Address: {{customer.address.street}}, {{customer.address.city}} {{customer.address.state}} {{customer.address.zip_code}}</h4>
+        <div class="contact">
+            <table>
+                <tr>
+                    <th>Type of Phone:</th>
+                    <th>Number:</th>
+                </tr>
+                {% for number in customer.phone_numbers.all %}
+                <tr>
+                    <td>{{number.number_type}}</td>
+                    <td>{{number.number}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+          </div>
+            <h3>Contracts:</h3>
+            <table>
+                <tr>
+                    <th>Contract ID:</th>
+                    <th>Status:</th>
+                    <!-- Contract status = open, closed, canceled -->
+                </tr>
+                {% for contract in customer.contracts.all %}
+                    {% if contract.status == "open" %}
+                        <tr>
+                            <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
+                            <td>{{contract.status}}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                {% for contract in customer.contracts.all %}
+                    {% if contract.status == "closed" %}
+                        <tr>
+                            <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
+                            <td>{{contract.status}}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                {% for contract in customer.contracts.all %}
+                    {% if contract.status == "canceled" %}
+                        <tr>
+                            <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
+                            <td>{{contract.status}}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+            </table>
+            <div class="commentbox">
+              <h3>Comments:</h3>
+                  {% for comment in customer.comments.all reversed %}
+                      <p>On {{comment.created_at}}, {{comment.user.first_name}} {{comment.user.last_name}} said: {{comment.content}}</p>
+                  {% endfor %}
+              <form action="/dashboard/customer/{{customer.id}}" method="post">
+                {% csrf_token %}
+                <h3>Leave a comment:</h3>
+                <input type="hidden" name="comment" value="comment">
+                <input type="text" name="content">
+                <button>Submit</button>
+              </form>
+            </div>
+            <!-- Adjust John's create field to make an edit field here. Until then, here's one that doesn't fit our style. -->
+            <h1>Edit customer</h1>
+            <form action="/dashboard/customer/{{customer.id}}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="update" value="update">
+              <label for="name">Name:</label>
+              <input type="text" name="name" value="{{customer.name}}">
+              <label for="website">Website:</label>
+              <input type="text" name="website" value="{{customer.website}}">
+              <label for="email">Email:</label>
+              <input type="text" name="email" value="{{customer.email}}">
+              <label for="address_name">Address Name:</label>
+              <input type="text" name="address_name" value="{{customer.address.name}}">
+              <label for="street">Street:</label>
+              <input type="text" name="street" value="{{customer.address.street}}">
+              <label for="city">City:</label>
+              <input type="text" name="city" value="{{customer.address.city}}">
+              <label for="state">State:</label>
+              <input type="text" name="state" value="{{customer.address.state}}">
+              <label for="zip_code">Zip Code:</label>
+              <input type="text" name="zip_code" value="{{customer.address.zip_code}}">
+              <button>Submit</button>
+            </form>
+            <form action="/dashboard/customer/{{customer.id}}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="delete" value = "delete">
+              <button>Delete</button>
+            </form>
+    </div>
+  
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      
+    <!-- bootstrap.js-->
+    <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+
+    <!-- Custom JavaScript -->
+    <!-- <script type="text/javascript" src="script.js"></script> -->
+
+  </body>
+</html>

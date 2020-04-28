@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from . import models
 from login_app.models import User
+from .models import Customer
 # Create your views here.
 
 ##### DEVELOPMENT ######
@@ -197,4 +198,51 @@ def contract(request, contract_id):
     pass
 
 def customer(request, customer_id):
-    pass
+    # POST data
+    if request.POST:
+        try:
+            if request.POST['comment']:
+                # Comment validation
+                # Comment.objects.create(content = request.POST["content"], user=logged_user(request))
+                return redirect(f"/dashboard/customer/{customer_id}")
+        except:
+            pass
+        try:
+            if request.POST['update']:
+                print("In the update function. Let's get some validations here")
+                print(request.POST)
+                # errors=models.Customer.objects.validation(request.POST)
+                # if len(errors) > 0:
+                    # request.session["errors"] = errors
+                    # return redirect(f"/dashboard/customer/{customer_id}")
+                customer_to_change = Customer.objects.get(id=customer_id)
+                customer_to_change.name = request.POST["name"]
+                customer_to_change.website = request.POST["website"]
+                customer_to_change.email = request.POST["email"]
+                customer_to_change.address.address_name = request.POST["address_name"]
+                customer_to_change.address.street = request.POST["street"]
+                customer_to_change.address.city = request.POST["city"]
+                customer_to_change.address.state = request.POST["state"]
+                customer_to_change.address.zip_code = request.POST["zip_code"]
+                customer_to_change.save()
+                customer_to_change.address.save()
+                return redirect(f"/dashboard/customer/{customer_id}")
+        except:
+            pass
+        try:
+            if request.POST['delete']:
+                customer_to_delete=Customer.objects.get(id=customer_id)
+                # customer_to_delete.delete()
+                # return redirect("/dashboard")
+                print(customer_to_delete)
+                return redirect(f"/dashboard/customer/{customer_id}")
+        except:
+            pass
+    
+    # No POST data
+    else:
+        context = {
+            "customer": Customer.objects.get(id=customer_id),
+            "user": logged_user(request)
+        }
+        return render(request, "customer.html", context)
