@@ -37,7 +37,7 @@ class Contract(models.Model):
     status= models.CharField(max_length=255)
     carrier_cost= models.DecimalField(decimal_places= 2, max_digits=8,  null=True)
     customer_price= models.DecimalField(decimal_places= 2,max_digits=8, null=True)
-    customer = models.ForeignKey(Customer, related_name="customers", on_delete=models.CASCADE, default=None)
+    customer = models.ForeignKey(Customer, related_name="contracts", on_delete=models.CASCADE, default=None)
     carrier = models.ForeignKey(Carrier, related_name="contracts", on_delete=models.CASCADE, default=None)
     pick_up_time= models.DateTimeField()
     delivery_time= models.DateTimeField()
