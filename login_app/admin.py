@@ -5,6 +5,8 @@ from login_app.models import User
 
 from manager_app.models import Comment, Contract, Customer, Carrier, PhoneNumber, Address, Route
 
+# This is a test comment. It was the only change made in test_feature branch
+
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
     pass
