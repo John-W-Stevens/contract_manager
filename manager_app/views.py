@@ -246,3 +246,99 @@ def customer(request, customer_id):
             "user": logged_user(request)
         }
         return render(request, "customer.html", context)
+
+
+
+
+#################### Kevin's adds ################################
+
+
+def carrier(request, carrier_id):
+# displays all carrier info / updating form
+    the_carrier = models.Carrier.objects.get(id=carrier_id)
+
+# gets open and closed contract counts for this carrier
+    # contracts = models.Carrier.objects.contracts
+    # open_count=0
+    # closed_count=0
+    # for x in contracts:
+    #     if x.contract_status == 'OPEN':
+    #         open_count += 1
+    #     elif x.contract_status == 'CLOSED':
+    #         closed_count += 1
+    context={
+        'carrier' : the_carrier,
+        # 'open_count' : open_count,
+        # 'closed_count' : closed_count
+    }
+    return render(request, 'carrier.html', context)
+
+
+def update_carrier(request):
+    # if len(errors) > 0:
+    #     for key, value in errors.items():
+    #         messages.error(request, value)
+    #     return redirect(f'/dashboard/carrier/{carrier_id}')
+
+    carrier_id = request.POST['carrier_id']
+    the_carrier = models.Carrier.objects.get(id=carrier_id)
+    user = User.objects.get(id=request.session['user_id'])
+
+    name= request.POST['name']
+    if name =='':
+        pass
+    else:
+        the_carrier.name = name
+        the_carrier.save()
+    email= request.POST['email']
+    if email =='':
+        pass
+    else:
+        the_carrier.email = email
+        the_carrier.save()
+    website= request.POST['website']
+    if website =='':
+        pass
+    else:
+        the_carrier.website = website
+        the_carrier.save()
+    new_phone= request.POST['new_phone']
+    new_type= request.POST['new_type']
+    if new_phone and new_type:
+        models.PhoneNumber.objects.create(number_type=new_type, number=new_phone, carrier= the_carrier)
+    else:
+        pass
+    comment= request.POST['comment']
+    if comment =='':
+        pass
+    else:
+        models.Commment.objects.create(content=comment, author=user, carrier=the_carrier)
+    return redirect(f'/dashboard/carrier/{carrier_id}')
+
+
+
+def update_carrier_phone(request):
+    # if len(errors) > 0:
+    #     for key, value in errors.items():
+    #         messages.error(request, value)
+    #     return redirect(f'/dashboard/carrier/{carrier_id}')
+    carrier_id = request.POST['carrier_id']
+    phone = request.POST['phonenumber']
+    phone_type = request.POST['phone_type']
+    if phone =='':    
+        pass
+    else:
+        phone_update= models.PhoneNumber.objects.get(id=request.POST['phone_id'])
+        phone_update.number = phone
+        phone_update.number_type = phone_type
+        phone_update.save()
+    return redirect(f'/dashboard/carrier/{carrier_id}')
+
+
+
+def delete_carrier(request, carrier_id):
+    the_carrier = models.Carrier.objects.get(id=carrier_id)
+    the_carrier.delete()
+    return redirect('/dashboard')
+
+

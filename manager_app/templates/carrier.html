@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+    <title>Carrier Page</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <a class="navbar-brand" href="/">Contract Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% if request.session.user_id == None %}
+            <a class="navbar-nav mr-auto nav-link disabled" href="/users"></a>
+            <a class="navbar-nav mr-lg-2 nav-link" href="/login">Signin</a>
+        {% else %}
+            <a class="navbar-nav mr-auto nav-link" href="#"></a>
+            <a class="navbar-nav mr-sm-0 nav-link" href="#">{{user.first_name}} {{user.last_name}} (admin)</a>
+            <a class="navbar-nav mr-sm-0 nav-link" href="/logout">Logoff</a>
+        {% endif %}
+        </div>
+    </nav>
+
+    <div class='container' id=info>
+        <h3>Carrier Information</h3>
+        <h4><strong>Carrier Name:</strong> {{ carrier.name }} </h4>
+                                {% for x in carrier.phone_numbers.all %}
+        <h4><strong>Phone:</strong> {{ x.number }} - {{ x.number_type }}</h4> 
+                                                {% endfor %}
+        <h4><strong>Email:</strong> {{ carrier.email }}</h4>
+        <h4><strong>Carrier Website:</strong> {{ carrier.website}}</h4>
+        <h4><strong>Open Contracts:</strong> {{ open_count }}</h4>
+        <h4><strong>Completed Contracts:</strong> {{ closed_count }}</h4>              
+        <h4><strong>Partner since:</strong> {{ carrier.created_at.date }} </h4>
+        <h4><strong>Last updated:</strong> {{ carrier.updated_at }}</h4>
+    </div>
+
+    <div class="container" id='comment_box'>
+        <h4 id='title'>All Carrier Comments</h4>
+        <ul id='list'>
+            {% for x in carrier.comments.all %}
+            <li>{{ x.content }} - {{ x.created_at }} - {{ x.author.first_name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form action="/dashboard/delete_carrier/{{ carrier.id }}">
+        <button id='delete'>Delete Carrier</button>
+    </form>
+
+    <hr>
+    <div class='container' id=update>
+        <h3>Update Carrier Info</h3>
+        <form action="/dashboard/update_carrier" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="carrier_id" value='{{ carrier.id }}'>
+            <label for="name">Name:</label>
+            <input type="text" name='name' placeholder='{{ carrier.name }}'> 
+            <br>
+            <label for="email">Email:</label>
+            <input type="text" name='email' placeholder='{{ carrier.email }}'>
+            <br>
+            <label for="website">Website:</label>
+            <input type="text" name='website' placeholder='{{ carrier.website }}'>
+            <br>
+            <label for="comment">Add Comment:</label>                                    
+            <input type="text" name='comment'>
+            <br>
+            <label for="add_number">Add New Phone:</label>
+            <input type="text" name='new_phone'> 
+            <label for="new_type">Phone Type:</label>
+            <select name="new_type">
+                <option value="office">Office</option>
+                <option value="cell">Cell</option>
+                <option value="home">Home</option>
+                <option value="personal">Personal</option>
+                <option value="work">Work</option>
+            </select>
+            <button>Update</button> <br>
+        </form>
+
+
+        {% for x in carrier.phone_numbers.all %}
+        <form action="/dashboard/update_carrier_phone" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="carrier_id" value='{{ carrier.id }}'>
+            <input type="hidden" name="phone_id" value='{{ x.id }}'>
+            <label for="phonenumber">Update Phone:</label>
+            <input type="text" name= 'phonenumber' placeholder='{{ x.number }}'>                                                 
+            <label for="phone_type">Phone Type:</label>
+            <select name="phone_type">
+                <option value="office">Office</option>
+                <option value="cell">Cell</option>
+                <option value="home">Home</option>
+                <option value="personal">Personal</option>
+                <option value="work">Work</option>
+            </select> 
+            <button>Save</button>
+            <button>Delete</button>
+        </form>
+        {% endfor %}
+    </div>
+
+
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <!-- bootstrap.js-->
+    <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+    <!-- Custom JavaScript -->
+    <!-- <script type="text/javascript" src="script.js"></script> -->
+
+    <style>
+
+        #info{
+            margin-top: 50px;
+            margin-left: 100px;
+            display: inline-block;
+            width: 500px;
+        }
+    
+        #update{
+            margin-top: 20px;
+            margin-left: 100px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    
+        h3{
+            text-decoration: underline;
+            margin-bottom: 40px;
+        }
+    
+        #title{
+            display: inline-block;
+            margin-left: 20px;
+        }
+    
+        #comment_box{
+            display: inline-block;
+            vertical-align: top;
+            width: 40%;
+            margin-top: 300px;
+            margin-left: 50px;
+        }
+    
+        #list{
+            border: 1px solid black;
+            height: 150px;
+            width: 80%;
+            overflow: auto;
+        }
+    
+        #delete{
+            margin-left: 1500px;
+            background-color: red;
+            color: white;
+        }
+    
+        </style>
+        
+</body>
+
+</html>
