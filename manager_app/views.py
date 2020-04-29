@@ -144,12 +144,23 @@ def index(request):
                 state = request.POST["delivery_state"],
                 zip_code = request.POST["delivery_zip_code"] 
             )
-            customer = models.Customer.objects.filter(name=request.POST["customer"])[0]
-            carrier = models.Carrier.objects.filter(name=request.POST["carrier"])[0]
-            customer.open_contracts += 1
-            carrier.open_contracts += 1
-            customer.save()
-            carrier.save()
+            customers = models.Customer.objects.filter(name=request.POST["customer"])
+            carriers = models.Carrier.objects.filter(name=request.POST["carrier"])
+            
+            if customers:
+                customer = customers[1]
+                customer.open_contracts += 1
+                customer.save()
+            else:
+                customer = None
+            if carriers:
+                carrier = carriers[1]
+                carrier.open_contracts += 1
+                carrier.save()
+            else:
+                carrier = None
+
+            # carrier.open_contracts += 1
             contract = models.Contract.objects.create(
                 status = request.POST["status"],
                 customer = customer,
@@ -181,7 +192,47 @@ def index(request):
         except KeyError:
             pass
 
-        return redirect("/dashboard")
+        try:
+            request.POST["archive_contract"]
+            contract = Contract.objects.filter(id=int(request.POST["archive_contract_id"]))[0]
+            contract.archived = True
+            contract.save()
+            return redirect("/dashboard")
+
+        except KeyError:
+            pass
+
+        try:
+            request.POST["restore_contract"]
+            contract = Contract.objects.filter(id=int(request.POST["restore_contract_id"]))[0]
+            contract.archived = False
+            contract.save()
+            return redirect("/dashboard")
+        except KeyError:
+            pass
+
+        try:
+            request.POST["delete_contract"]
+            contract = Contract.objects.filter(id=int(request.POST["delete_contract_id"]))[0]
+
+            user_data = {
+                "email": logged_user(request).email,
+                "password": request.POST["password"]
+            }
+            errors = User.objects.login_validations(user_data)
+
+            if len(errors) > 0:
+                print("Invalid Password")
+                return redirect("/dashboard")
+            else:
+                print("deleting...")
+                contract.delete()
+                return redirect("/dashboard")
+
+        except KeyError:
+            pass
+
+        # return redirect("/dashboard")
     
     
     # GET Request -> Render dashboard.html
