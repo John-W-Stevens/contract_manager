@@ -61,7 +61,11 @@
           <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_customer">Update Customer</button>
         </div>
         <div class="col-12 text-center">
+          {% if customer.archived == False %}
           <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#archive_customer">Archive Customer</button>
+          {% else %}
+          <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_customer">Restore Customer</button>
+          {% endif %}
         </div>
       </div>
       <div class="row">
@@ -410,15 +414,25 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+          {% if customer.archived == True %}
+          <div class="modal-body">
+            Restoring this customer will remove it from the archives and store it in the customer table. Are you sure you want to proceed?
+          </div>
+          {% else %}
           <div class="modal-body">
             Archiving this customer will remove it from the customers table and store it in the archive. Are you sure you want to proceed?
           </div>
+          {% endif %}
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <form action="/dashboard/customer/{{customer.id}}" method="post">
             {% csrf_token %}
-              <input type="hidden" name="hiddenkey" value="archive">
+            <input type="hidden" name="hiddenkey" value="archive">
+            {% if customer.archived == True %}
+              <button class="btn btn-success">Restore</button>
+            {% else %}  
               <button class="btn btn-danger">Archive</button>
+            {% endif %}
             </form>
           </div>
         </div>
