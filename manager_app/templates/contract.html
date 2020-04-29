@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+
+    {% load static %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+
+    <!-- Custom CSS stylesheet-->
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
+</head>
+<body>
+    <div>
+        <form action='/dashboard/edit_contract/{{contract.id}}' method="POST">
+            {% csrf_token %}
+            <p>Current Routing:{{contract.route.start.name}} to {{contract.route.end.name}}</p>
+            <p>Starting Point: {{contract.route.start.street}}, {{contract.route.start.city}}</p>
+            <p>Ending Point: {{contract.route.end.street}}, {{contract.route.end.city}}</p>
+            <!-- <select name='route'>
+                {% for route in allroutes %}:
+                <option value ='{{route.id}}'>{{route.start.street}},{{route.start.city}} to {{route.end.street}},{{route.end.city}}</option>
+                {% endfor %}
+            </select> -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit_routes">
+                Edit Contract
+              </button>                       
+            <p>Carrier:{{contract.carrier.name}}</p>
+            <label for='carrier'>Carrier</label>
+            <select name='carrier' value='{{contract.carrier.name}}'>                                
+                {% for carrier in allcarriers %}:                
+                <option value ={{carrier.id}}>{{carrier.name}}</option>                
+                {% endfor %}                
+            </select>
+            <p>Customer:{{contract.customer.name}}</p>
+            <label for='customer'>Customer</label>
+            <select name='customer'>
+                {% for customer in allcustomers %}:
+                <option value ={{customer.id}}>{{customer.name}}</option>
+                {% endfor %}
+            </select><br>
+            <label display='inline-block' for='status'>Status:</label>
+            <p display='inline-block'>{{contract.status}}</p>
+            <select name='status'>
+                <option value='open'>open</option>
+                <option value='closed'>closed</option>
+                <option value='canceled'>canceled</option>
+            </select><br>
+            <label for='carrier_cost'>Carrier Cost #</label>
+            <input type='text' name='carrier_cost' value='{{contract.carrier_cost}}'>
+            <label for='customer_price'>Customer Price $</label>
+            <input type='text' name='customer_price' value='{{contract.customer_price}}'>
+            <p>Current Start:{{contract.pick_up_time}}</p>
+            <div class="row">
+                <div class="col-6">
+                  <label>Pickup Date</label>
+                  <input type="hidden" id="hidden_pickup_date" name="pickup_date">
+                  <input class="form-control" id="pickup_date" value="" type="text" placeholder="mm/dd/yyyy">
+                </div>
+                <div class="col-6">
+                    <label>Pickup Time:</label>
+                    <input id="timepicker1" class="form-control time_input" name="pickup_time">
+                </div>
+              </div>
+            <p>Current End:{{contract.delivery_time}}</p>
+            <div class="col-6">
+                <label>Delivery Date:</label>
+                <input type="hidden" id="hidden_delivery_date" name="delivery_date">
+                <input class="form-control" id="delivery_date" value="" type="text" placeholder="mm/dd/yyyy">
+              </div>
+              <div class="col-6">
+                <label>Delivery Time:</label>
+                <!-- <input type="text" class="form-control" name="delivery_time" placeholder="hh:mm"> -->
+                <input id="timepicker2" class="form-control time_input" name="delivery_time">
+              </div>
+            <p>Created At:{{contract.created_at}}</p>
+            <p>Updated At:{{contract.updated_at}}</p>
+            
+            
+            <button type='submit'>Edit</button>
+            
+        </form>
+
+
+    </div>
+    <!-- Modal -->
+    <div class="modal fade text-left" id="edit_routes" tabindex="-1" role="dialog" aria-labelledby="edit_routes_modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="edit_routes_modal">Edit Contract</h3>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form enctype="multipart/form-data" action="/dashboard/edit_contract/{{contract.id}}" method="post" id="edit_routes_form">
+              {% csrf_token %}
+              <input type="hidden" name="edit_routes">
+              <div class="form-group row">              
+                    
+                <div class="col-6">
+                  <label>Contract Name:</label>
+                  <input type="text" name="contract_name" class="form-control" >
+                </div> -->
+                <div class="col-6">
+                  <label>Status:</label>
+                  <select class="form-control" name="status">
+                    <option>{{contract.status}}</option>
+                    <option>open</option>
+                    <option>closed</option>
+                    <option>canceled</option>
+                  </select>
+                </div>  
+              </div> -->
+              <!-- Select Customer and Carrier -->
+              <div class="row">
+                <div class="col-6">
+                  <label>Select Customer</label>
+                  <select class="form-control" name="customer" >
+                    <option value="{{customer.id}}">{{contract.customer.name}}</option>
+                    {% for customer in allcustomers %}
+                    <option value="{{customer.id}}">{{customer.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-6">
+                  <label>Select Carrier</label>
+                  <select class="form-control" name="carrier">
+                    <option value='{{carrier.id}}'>{{contract.carrier.name}}</option>
+                    {% for carrier in allcarriers %}
+                    <option value='{{carrier.id}}'>{{carrier.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="row contract_modal_mid_header">
+                <div class="col-6">
+                  <label>Customer Price:</label>
+                  <input type="text" name="customer_price" class="form-control" value='{{contract.customer_price}}'>
+                </div>
+                <div class="col-6">
+                  <label>Carrier Cost:</label>
+                  <input type="text" name="carrier_cost" class="form-control" value="{{contract.carrier_cost}}">
+                </div>
+              </div> -->
+
+              <div class="row contract_modal_mid_header">
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col-12 text-center">
+                      <h4>Pickup Details</h4>
+
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-6">
+                      <label>Pickup Date</label>
+                      
+                      <input type="hidden" id="hidden_pickup_date" name="pickup_date">
+                      <input class="form-control" id="pickup_date" value='{{contract.pick_up_time|date:"M d, yy"}}' type="text" placeholder="mm/dd/yyyy">
+                    </div>
+                    <div class="col-6">
+                        <label>Pickup Time:</label>
+                        <input id="timepicker1" class="form-control time_input" value='{{contract.pick_up_time|date:"g:i A"}}' name="pickup_time">
+                    </div>
+                  </div>
+
+                  <div class="row contract_modal_mid_header">
+                    <div class="col-12">
+                      <input type='hidden' name='pickup_address' value='{{contract.route.start}}'> 
+                      <label>Pickup Address:</label>
+                      <input type="text" name="pickup_street_address" class="form-control" value='{{contract.route.start.street}}'>
+                    </div>
+                  </div>
+                  <div class="row contract_modal_mid_header">
+                    <div class="col-5">
+                      <label>City:</label>
+                      <input type="text" class="form-control" name="pickup_city" value='{{contract.route.start.city}}'>
+                    </div>
+                    <div class="col-3">
+                      <label>State:</label>
+                      <select class="form-control" id="pickup_state" name="pickup_state">
+                        <option value='{{contract.route.start.state}}' selected>{{contract.route.start.state}}</option>  
+                        <option value="">N/A</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AR">Arkansas</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="CA">California</option>
+                        <option value="CO">Colorado</option>
+                        <option value="CT">Connecticut</option>
+                        <option value="DC">District of Columbia</option>
+                        <option value="DE">Delaware</option>
+                        <option value="FL">Florida</option>
+                        <option value="GA">Georgia</option>
+                        <option value="HI">Hawaii</option>
+                        <option value="IA">Iowa</option>
+                        <option value="ID">Idaho</option>
+                        <option value="IL">Illinois</option>
+                        <option value="IN">Indiana</option>
+                        <option value="KS">Kansas</option>
+                        <option value="KY">Kentucky</option>
+                        <option value="LA">Louisiana</option>
+                        <option value="MA">Massachusetts</option>
+                        <option value="MD">Maryland</option>
+                        <option value="ME">Maine</option>
+                        <option value="MI">Michigan</option>
+                        <option value="MN">Minnesota</option>
+                        <option value="MO">Missouri</option>
+                        <option value="MS">Mississippi</option>
+                        <option value="MT">Montana</option>
+                        <option value="NC">North Carolina</option>
+                        <option value="ND">North Dakota</option>
+                        <option value="NE">Nebraska</option>
+                        <option value="NH">New Hampshire</option>
+                        <option value="NJ">New Jersey</option>
+                        <option value="NM">New Mexico</option>
+                        <option value="NV">Nevada</option>
+                        <option value="NY">New York</option>
+                        <option value="OH">Ohio</option>
+                        <option value="OK">Oklahoma</option>
+                        <option value="OR">Oregon</option>
+                        <option value="PA">Pennsylvania</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="RI">Rhode Island</option>
+                        <option value="SC">South Carolina</option>
+                        <option value="SD">South Dakota</option>
+                        <option value="TN">Tennessee</option>
+                        <option value="TX">Texas</option>
+                        <option value="UT">Utah</option>
+                        <option value="VA">Virginia</option>
+                        <option value="VT">Vermont</option>
+                        <option value="WA">Washington</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WY">Wyoming</option>
+                      </select>
+                    </div>
+                    <div class="col-4">
+                      <label>Zip:</label>
+                      <input type="text" class="form-control" name="pickup_zip_code" value='{{contract.route.start.zip_code}}'>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col-12 text-center">
+                      <h4>Delivery Details</h4>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <label>Delivery Date:</label>
+                      <input type="hidden" id="hidden_delivery_date" name="delivery_date">
+                      <input class="form-control" id="delivery_date" value='{{contract.delivery_time|date:"M d, yy"}}' type="text" placeholder="mm/dd/yyyy">
+                    </div>
+                    <div class="col-6">
+                      <label>Delivery Time:</label>
+                      <!-- <input type="text" class="form-control" name="delivery_time" placeholder="hh:mm"> -->
+                      <input id="timepicker2" class="form-control time_input" value='{{contract.delivery_time|date:"g:i A"}}' name="delivery_time">
+                    </div>
+                  </div>
+                  <div class="row contract_modal_mid_header">
+                    <div class="col-12 ">
+                      <input type='hidden' name='delivery_address' value='{{contract.route.end}}'>  
+                      <label>Delivery Address:</label>
+                      <input type="text" name="delivery_street_address" value='{{contract.route.end.street}}' class="form-control">
+                    </div>
+                  </div>
+                  <div class="row contract_modal_mid_header">
+                    <div class="col-5">
+                      <label>City:</label>
+                      <input type="text" class="form-control" value='{{contract.route.end.city}}'name="delivery_city">
+                    </div>
+                    <div class="col-3">
+                      <label>State:</label>
+                      <select class="form-control" id="delivery_state" name="delivery_state">
+                        <option value='{{contract.route.end.state}}' selected>{{contract.route.end.state}}</option>
+                        <option value="">N/A</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AR">Arkansas</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="CA">California</option>
+                        <option value="CO">Colorado</option>
+                        <option value="CT">Connecticut</option>
+                        <option value="DC">District of Columbia</option>
+                        <option value="DE">Delaware</option>
+                        <option value="FL">Florida</option>
+                        <option value="GA">Georgia</option>
+                        <option value="HI">Hawaii</option>
+                        <option value="IA">Iowa</option>
+                        <option value="ID">Idaho</option>
+                        <option value="IL">Illinois</option>
+                        <option value="IN">Indiana</option>
+                        <option value="KS">Kansas</option>
+                        <option value="KY">Kentucky</option>
+                        <option value="LA">Louisiana</option>
+                        <option value="MA">Massachusetts</option>
+                        <option value="MD">Maryland</option>
+                        <option value="ME">Maine</option>
+                        <option value="MI">Michigan</option>
+                        <option value="MN">Minnesota</option>
+                        <option value="MO">Missouri</option>
+                        <option value="MS">Mississippi</option>
+                        <option value="MT">Montana</option>
+                        <option value="NC">North Carolina</option>
+                        <option value="ND">North Dakota</option>
+                        <option value="NE">Nebraska</option>
+                        <option value="NH">New Hampshire</option>
+                        <option value="NJ">New Jersey</option>
+                        <option value="NM">New Mexico</option>
+                        <option value="NV">Nevada</option>
+                        <option value="NY">New York</option>
+                        <option value="OH">Ohio</option>
+                        <option value="OK">Oklahoma</option>
+                        <option value="OR">Oregon</option>
+                        <option value="PA">Pennsylvania</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="RI">Rhode Island</option>
+                        <option value="SC">South Carolina</option>
+                        <option value="SD">South Dakota</option>
+                        <option value="TN">Tennessee</option>
+                        <option value="TX">Texas</option>
+                        <option value="UT">Utah</option>
+                        <option value="VA">Virginia</option>
+                        <option value="VT">Vermont</option>
+                        <option value="WA">Washington</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WY">Wyoming</option>
+                      </select>
+                    </div>
+                    <div class="col-4">
+                      <label>Zip:</label>
+                      <input type="text" class="form-control" value='{{contract.route.end.zip_code}}'name="delivery_zip_code">
+                    </div>
+                  </div>
+                </div>                        
+              </div>
+            
+              <div class="form-group row contract_modal_mid_header">
+                <div class="col-12">
+                  <label>Comments:</label>
+                  <textarea class="form-control modal_comments" name="comments"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                <button class="btn btn-primary btn-md" id="edit_routes_button">Save Contract</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    
+
+
+
+
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      
+    <!-- bootstrap.js-->
+    <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+
+    <!-- Custom JavaScript -->
+    <!-- <script type="text/javascript" src="script.js"></script> -->
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <script>
+      $(document).ready(function(){
+        $('#pickup_date').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+
+        $(document).on("click","button",function(){
+          $("#hidden_pickup_date").val($("#pickup_date").val())
+        })
+
+        $('#delivery_date').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+        $(document).on("click","button",function(){
+          $("#hidden_delivery_date").val($("#delivery_date").val())
+        })
+
+      })
+    </script>
+
+    <script>
+      $('#timepicker1').timepicker({
+          uiLibrary: 'bootstrap4'
+      });
+    </script>
+
+    <script>
+      $('#timepicker2').timepicker({
+          uiLibrary: 'bootstrap4'
+      });
+    </script>
+  </body>
+</html>
+    
+</body>
+</html>

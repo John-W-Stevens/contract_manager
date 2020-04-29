@@ -12,7 +12,9 @@ urlpatterns = [
     path("/customer/<int:customer_id>", views.customer),
         # GET -> render customer.html
 
-    path("/contract/<int:contract_id>", views.contract),
+    path("/contract/<int:contract_id>", views.contract, name="contract_detail"),
         # GET -> render contract.html
 
+    path('/edit_contract/<int:contract_id>',views.edit_contract),
+        # Josh contract edit route
 ]
