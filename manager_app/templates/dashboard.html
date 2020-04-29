@@ -44,9 +44,9 @@
       #myTab {
         margin-bottom: 10px;
       }
-      /* .table_header { */
-        /* margin-bottom: 10px; */
-      /* } */
+      .archive_header {
+        margin-top: 10px;
+      }
     </style>
 
   </head>
@@ -79,7 +79,6 @@
           <h3>Dashboard</h3>
         </div>
         <div class="col-8 text-right">
-         <!-- <button type="button" href="#" class="btn btn-outline-primary btn-sm">Add Contract</button> -->
          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_contract">Add Contract</button>
          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_customer">Add Customer</button>
          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_carrier">Add Carrier</button>
@@ -137,9 +136,6 @@
             </table>
           </div>
           
-
-
-          
           <!-- Carriers Table -->
           <div class="tab-pane fade table-header" id="carriers" role="tabpanel" aria-labelledby="profile-tab">
 
@@ -151,6 +147,7 @@
                   <th>Completed</th>
                   <th>Address</th>
                   <th>Contact</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,6 +158,9 @@
                   <td>{{ carrier.completed_contracts }}</td>
                   <td>{{ carrier.address.street }}, {{ carrier.address.city }} {{ carrier.address.state }}, {{ carrier.address.zip_code }}</td>
                   <td>{{ carrier.phone_numbers.first.number }}</td>
+                  <td>
+                    <a href="" class="archive_carrier_link" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_carrier_modal">Archive</a>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -177,6 +177,7 @@
                   <th>Completed</th>
                   <th>Address</th>
                   <th>Contact</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,41 +188,119 @@
                   <td>{{ customer.completed_contracts }}</td>
                   <td>{{ customer.address.street }}, {{ customer.address.city }} {{ customer.address.state }}, {{ customer.address.zip_code }}</td>
                   <td>{{ customer.phone_numbers.first.number }}</td>
+                  <td>
+                    <a href="" class="archive_customer_link" data-toggle="modal" data-customer-id="{{customer.id}}" data-target="#archive_customer_modal">Archive</a>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         
-          <!-- Archive Table -->
+          <!-- Archive Tables -->
           <div class="tab-pane fade" id="archive" role="tabpanel" aria-labelledby="archive-tab">
-            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="archive_datatable">
-              <thead class ="thead-light">
-                <tr>
-                  <th>Contract Id</th>
-                  <th>Carrier</th>
-                  <th>Customer</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for contract in archived_contracts %}
-                <tr>
-                  <td><a href="/dashboard/contract/{{ contract.id }}">{{contract.id}}</a></td>
-                  <td><a href="/dashboard/carrier/{{ contract.carrier.id }}">{{contract.carrier.name}}</a></td>
-                  <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
-                  <td>{{contract.status}}</td>
-                  <td>
-                    <!-- <a href="#">Restore</a>&nbsp| -->
-                    <a href="" class="restore_contract_link" data-toggle="modal" data-contract-id="{{contract.id}}" data-target="#restore_modal">Restore</a>&nbsp|
-                    <a href="" class="delete_contract_link" data-toggle="modal" data-contract-id="{{contract.id}}" data-target="#delete_modal">Delete</a>
-                    <!-- <a href="#">Delete</a> -->
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            
+          <!-- Archive Contracts -->
+          <div class="text-center archive_header">
+            <h3>Contracts Archive</h3>
+          </div>
+          <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="archive_datatable">
+            <thead class ="thead-light">
+              <tr>
+                <th>Contract Id</th>
+                <th>Carrier</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contract in archived_contracts %}
+              <tr>
+                <td><a href="/dashboard/contract/{{ contract.id }}">{{contract.id}}</a></td>
+                <td><a href="/dashboard/carrier/{{ contract.carrier.id }}">{{contract.carrier.name}}</a></td>
+                <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
+                <td>{{contract.status}}</td>
+                <td>
+                  <!-- <a href="#">Restore</a>&nbsp| -->
+                  <a href="" class="restore_contract_link" data-toggle="modal" data-contract-id="{{contract.id}}" data-target="#restore_modal">Restore</a>&nbsp|
+                  <a href="" class="delete_contract_link" data-toggle="modal" data-contract-id="{{contract.id}}" data-target="#delete_modal">Delete</a>
+                  <!-- <a href="#">Delete</a> -->
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <!-- Archive Carriers -->
+          <div class="text-center archive_header">
+            <h3>Carriers Archive</h3>
+
+          </div>
+          <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="archive_carriers_datatable">
+            <thead class ="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Carrier</th>
+                <th>Open Contracts</th>
+                <th>Completed</th>
+                <th>Address</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for carrier in archived_carriers %}
+              <tr>
+                <td>{{carrier.id}}</td>
+                <td><a href="/dashboard/carrier/{{ carrier.id }}">{{carrier.name}}</a></td>
+                <td>{{carrier.open_contracts}}</td>
+                <td>{{carrier.completed_contracts}}</td>
+                <td>{{carrier.address.street}}, {{carrier.address.city}} {{carrier.addresss.state}}, {{carrier.address.zip_code}}</td>
+                <td>
+                  <a href="" class="restore_carrier_link" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#restore_carrier_modal">Restore</a>
+                  {% if carrier.contracts.all|length == 0 %}
+                  &nbsp|&nbsp&nbsp<a href="" class="delete_carrier_link" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#delete_carrier_modal">Delete</a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <!-- Archive Customer -->
+          <div class="text-center archive_header">
+            <h3 class="archive_header">Customers Archive</h3>
+          </div>
+          <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="archive_customers_datatable">
+            <thead class ="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Open Contracts</th>
+                <th>Completed</th>
+                <th>Address</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for customer in archived_customers %}
+              <tr>
+                <td>{{customer.id}}</td>
+                <td><a href="/dashboard/customer/{{ customer.id }}">{{customer.name}}</a></td>
+                <td>{{customer.open_contracts}}</td>
+                <td>{{customer.completed_contracts}}</td>
+                <td>{{customer.address.street}}, {{customer.address.city}} {{customer.addresss.state}}, {{customer.address.zip_code}}</td>
+                <td>
+                  <a href="" class="restore_customer_link" data-toggle="modal" data-customer-id="{{customer.id}}" data-target="#restore_customer_modal">Restore</a>
+                  {% if customer.contracts.all|length == 0 %}
+                  &nbsp|&nbsp&nbsp<a href="" class="delete_customer_link" data-toggle="modal" data-customer-id="{{customer.id}}" data-target="#delete_customer_modal">Delete</a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
           </div>
 
         </div>
@@ -769,13 +848,13 @@
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title" id="achiveModal">Archive this contract?</h5>
+                      <h5 class="modal-title" id="archiveModal">Archive this contract?</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
                     <div class="modal-body">
-                      Archiving this contract will remove it from the contracts table and store it in the archive. Are you sure you want to proceed.
+                      Archiving this contract will remove it from the contracts table and store it in the archive. Are you sure you want to proceed?
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -786,7 +865,6 @@
                         <input type="hidden" name="archive_contract_id" id="archive_contract_id">
                         <button class="btn btn-danger">Archive</button>
                       </form>
-                    
                     </div>
                   </div>
                 </div>
@@ -821,7 +899,7 @@
               </div>
 
 
-              <!-- Modal for Restoring a Contract -->
+              <!-- Modal for Deleting a Contract -->
               <div class="modal fade" id="delete_modal" tabindex="-1" role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
@@ -855,6 +933,186 @@
                 </div>
               </div>
 
+
+              <!-- Modal for Archiving a Carrier -->
+              <div class="modal fade" id="archive_carrier_modal" tabindex="-1" role="dialog" aria-labelledby="archiveCarrierModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="archiveCarrierModal">Archive this carrier?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Archiving this carrier will remove it from the carriers table and store it in the archive. Are you sure you want to proceed?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  
+                      <form action="/dashboard" method="post">
+                      {% csrf_token %}
+                        <input type="hidden" name="archive_carrier">
+                        <input type="hidden" name="archive_carrier_id" id="archive_carrier_id">
+                        <button class="btn btn-danger">Archive</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal for Restoring a Carrier -->
+              <div class="modal fade" id="restore_carrier_modal" tabindex="-1" role="dialog" aria-labelledby="restoreCarrierModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="restoreCarrierModal">Restore this carrier?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Restoring this carrier will remove it from the archive and place it back among all active carrier.
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  
+                      <form action="/dashboard" method="post">
+                      {% csrf_token %}
+                        <input type="hidden" name="restore_carrier">
+                        <input type="hidden" name="restore_carrier_id" id="restore_carrier_id">
+                        <button class="btn btn-success">Restore</button>
+                      </form>
+                    
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal for Deleting a Carrier -->
+              <div class="modal fade" id="delete_carrier_modal" tabindex="-1" role="dialog" aria-labelledby="deleteCarrierModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="deleteCarrierModal">Delete this carrier?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Deleting this carrier will permenantly remove it from your database. This action cannot be undone. Are you sure you want to delete this carrier?
+                      <form action="/dashboard" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_carrier">
+                        <input type="hidden" name="delete_carrier_id" id="delete_carrier_id">
+                      </div>
+                      <div class="modal-footer">
+                            <div class="col-12">
+                              <label>Enter your password to proceed:</label>
+                              <input type="password" class="form-control" name="password">
+
+                            </div>
+                          <div class="col-12 text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <button class="btn btn-danger">Delete Carrier</button>
+                          </div>            
+                      </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Modal for Archiving a Customer -->
+              <div class="modal fade" id="archive_customer_modal" tabindex="-1" role="dialog" aria-labelledby="archiveCustomerModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="archiveCustomerModal">Archive this customer?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Archiving this customer will remove it from the customers table and store it in the archive. Are you sure you want to proceed?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  
+                      <form action="/dashboard" method="post">
+                      {% csrf_token %}
+                        <input type="hidden" name="archive_customer">
+                        <input type="hidden" name="archive_customer_id" id="archive_customer_id">
+                        <button class="btn btn-danger">Archive</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Modal for Restoring a Customer -->
+              <div class="modal fade" id="restore_customer_modal" tabindex="-1" role="dialog" aria-labelledby="restoreCustomerModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="restoreCustomerModal">Restore this customer?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Restoring this customer will remove it from the archive and place it back among all active customers.
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  
+                      <form action="/dashboard" method="post">
+                      {% csrf_token %}
+                        <input type="hidden" name="restore_customer">
+                        <input type="hidden" name="restore_customer_id" id="restore_customer_id">
+                        <button class="btn btn-success">Restore</button>
+                      </form>
+                    
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal for Deleting a Customer -->
+              <div class="modal fade" id="delete_customer_modal" tabindex="-1" role="dialog" aria-labelledby="deleteCustomerModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="deleteCustomerModal">Delete this customer?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Deleting this customer will permenantly remove it from your database. This action cannot be undone. Are you sure you want to delete this customer?
+                      <form action="/dashboard" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_customer">
+                        <input type="hidden" name="delete_customer_id" id="delete_customer_id">
+                      </div>
+                      <div class="modal-footer">
+                            <div class="col-12">
+                              <label>Enter your password to proceed:</label>
+                              <input type="password" class="form-control" name="password">
+
+                            </div>
+                          <div class="col-12 text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <button class="btn btn-danger">Delete Customer</button>
+                          </div>            
+                      </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
   </div>
 
@@ -917,6 +1175,8 @@
         $("#carriers_datatable").DataTable();
         $("#customers_datatable").DataTable();
         $("#archive_datatable").DataTable();
+        $("#archive_carriers_datatable").DataTable();
+        $("#archive_customers_datatable").DataTable();
       });
     </script>
 
@@ -925,6 +1185,8 @@
     </script>
 
     <script>
+
+      // operations for contracts
       $(".archive_contract_link").on("click",function(e){
         var contract_id = $(this).attr("data-contract-id")
         $("#archive_contract_id").val(contract_id)
@@ -937,6 +1199,36 @@
         var contract_id = $(this).attr("data-contract-id")
         $("#delete_contract_id").val(contract_id)
       })
+
+      $(".archive_carrier_link").on("click",function(e){
+        var carrier_id = $(this).attr("data-carrier-id")
+        $("#archive_carrier_id").val(carrier_id)
+      })
+      $(".restore_carrier_link").on("click",function(e){
+        var carrier_id = $(this).attr("data-carrier-id")
+        $("#restore_carrier_id").val(carrier_id)
+      })
+      $(".delete_carrier_link").on("click",function(e){
+        var carrier_id = $(this).attr("data-carrier-id")
+        $("#delete_carrier_id").val(carrier_id)
+      })
+
+
+      $(".archive_customer_link").on("click",function(e){
+        var customer_id = $(this).attr("data-customer-id")
+        $("#archive_customer_id").val(customer_id)
+      })
+      $(".restore_customer_link").on("click",function(e){
+        var customer_id = $(this).attr("data-customer-id")
+        $("#restore_customer_id").val(customer_id)
+      })
+      $(".delete_customer_link").on("click",function(e){
+        var customer_id = $(this).attr("data-customer-id")
+        $("#delete_customer_id").val(customer_id)
+      })
+
+
+
     </script>
 
   </body>
