@@ -41,8 +41,8 @@ class Contract(models.Model):
     status= models.CharField(max_length=255)
     carrier_cost= models.DecimalField(decimal_places= 2, max_digits=8,  null=True)
     customer_price= models.DecimalField(decimal_places= 2,max_digits=8, null=True)
-    customer = models.ForeignKey(Customer, related_name="contracts", on_delete=models.CASCADE, default=None)
-    carrier = models.ForeignKey(Carrier, related_name="contracts", on_delete=models.CASCADE, default=None)
+    customer = models.ForeignKey(Customer, related_name="contracts", on_delete=models.SET_NULL, blank=True, null=True)
+    carrier = models.ForeignKey(Carrier, related_name="contracts", on_delete=models.SET_NULL, blank=True, null=True)
     pick_up_time= models.DateTimeField()
     delivery_time= models.DateTimeField()
     created_at= models.DateTimeField(auto_now_add=True)
@@ -64,7 +64,7 @@ class Route(models.Model):
     updated_at= models.DateTimeField(auto_now=True)
     start= models.ForeignKey(Address, related_name='start_route', on_delete=models.DO_NOTHING)
     end= models.ForeignKey(Address, related_name='end_route', on_delete=models.DO_NOTHING)
-    contract= models.OneToOneField(Contract, related_name='route', on_delete=models.DO_NOTHING)
+    contract= models.OneToOneField(Contract, related_name='route', on_delete=models.CASCADE)
 
 class Comment(models.Model):
     content= models.TextField()
