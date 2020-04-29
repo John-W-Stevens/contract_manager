@@ -9,6 +9,7 @@
     <title>Carrier Page</title>
 
     <style>
+      
     .top_row {
         margin-top: 10px;
         margin-bottom: 10px;
@@ -17,6 +18,15 @@
     .table_nav {
         margin-bottom: 5px;
     }
+
+    #update_but{
+      margin-right: -25px;
+    }
+
+    #edit_button{
+      margin-right: 5px;
+    }
+
     </style>
 
 </head>
@@ -45,18 +55,29 @@
 <!-- Container -->
 <div class="container">
   <div class="row top_row">
+  </div>
+  <div class='row'>
+
+    <div class="col-3 offset-6 text-right" id='update_but'>
+      <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_carrier">Update Carrier</button>
+    </div>
+    <div class="col-3 text-left">
+      {% if carrier.archived == False %}
+      <div >
+        <button class="btn-danger btn-sm" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_modal">Archive Carrier</button>
+      </div>
+      {% else %}
+      <div>
+        <button class="btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_modal">Restore Carrier</button>
+      </div>
+      {% endif %}
+    </div>
+
     <div class="col-12 text-center">
       <h1>{{carrier.name}}</h1>
     </div>
   </div>
-  <div class="col-12 text-center">
-    <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_carrier">Update Carrier</button>
-    <form action="/dashboard/carrier/{{carrier.id}}" method="post">
-      {% csrf_token %}
-      <input type="hidden" name="hiddenkey" value = "delete">
-      <button class="btn btn-outline-secondary btn-sm">Delete Carrier</button>
-    </form>
-  </div>
+  <!-- </div> -->
   <div class="row">
     <div class ="col-12 table_nav">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -91,15 +112,17 @@
           <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contacts_datatable">
             <thead class = "thead-light">
               <tr>
-                <th>Type of Phone</th>
                 <th>Number</th>
+                <th>Type of Phone</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {% for number in carrier.phone_numbers.all %}
               <tr>
-                <td>{{number.number_type}}</td>
                 <td>{{number.number}}</td>
+                <td>{{number.number_type}}</td>
+                <td><button class="btn-outline-primary btn-sm edit_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_edit_modal" id='edit_button'>Edit Number</button><button class="btn-outline-danger btn-sm delete_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_delete_modal">Delete Number</button></td>
               </tr>
               {% endfor %}
             </tbody>
@@ -233,7 +256,6 @@
               </div>
             </div>
 
-
               <!-- Contact Information -->
             <div class="form-group row">
               <div class="col-6">
@@ -344,6 +366,106 @@
 </div>
 
 
+<!-- Modal for Archiving a Carrier -->
+<div class="modal fade" id="archive_modal" tabindex="-1" role="dialog" aria-labelledby="archiveModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        {% if carrier.archived == False %}
+        <h5 class="modal-title" id="achiveModal">Archive this carrier?</h5>
+        {% else %}
+        <h5 class="modal-title" id="achiveModal">Restore this carrier?</h5>
+        {% endif %}
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% if carrier.archived == True %}
+      <div class="modal-body">
+        Restoring this carrier will add it back to the carriers table. Are you sure you want to proceed?
+      </div>
+      {% else %}
+      <div class="modal-body">
+        Archiving this carrier will remove it from the carriers table and store it in the archive. Are you sure you want to proceed?
+      </div>
+      {% endif %}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="/dashboard/carrier/{{carrier.id}}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="hiddenkey" value='archive'>
+          {% if carrier.archived == False %}
+          <button class="btn btn-danger">Archive</button>
+          {% else %}
+          <button class="btn-outline-success btn-sm">Restore</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Deleting a phone -->
+<div class="modal fade" id="phone_delete_modal" tabindex="-1" role="dialog" aria-labelledby="deletephone" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deletephone">Delete phone number</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this phone number?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="/dashboard/carrier/{{carrier.id}}" method="post">
+        {% csrf_token %}
+          <input type="hidden" name="hiddenkey" value='delete'>
+          <input type="hidden" name='phone_id' id='phoneid'>
+          <button class="btn btn-danger">Delete Phone</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal for Editing a Phone Number -->
+<div class="modal fade text-left" id="phone_edit_modal" tabindex="-1" role="dialog" aria-labelledby="phone_edit_modal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="edit_number_modal">Edit a Phone Number</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form enctype="multipart/form-data" action="/dashboard/carrier/{{carrier.id}}" method="post" id="edit_phone_form">
+          {% csrf_token %}
+          <input type="hidden" name="hiddenkey" value= "update_phone">
+          {% for number in carrier.phone_numbers.all %}
+          <div class="col-12">
+            <input type="hidden" name="number_id" value= {{number.id}}>
+            <label for="phone_number">Phone Number</label>
+            <input type="text" name="update_phone" class="form_control" placeholder="{{number.number}}">
+            <label for="phone_type">Type of Phone</label>
+            <input type="text" name="update_type" class="form_control" placeholder='{{number.number_type}}'>
+          </div>
+          {% endfor %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+            <button class="btn btn-primary btn-md" id="add_number_button">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <!-- Popper.js -->
@@ -352,6 +474,13 @@
     <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
+
+  <script>
+    $(".delete_this_phone").on('click', function(){
+      var phoneid = $(this).attr('data-phoneid')
+      $('#phoneid').val(phoneid)
+    })
+  </script>
 
         
 </body>
