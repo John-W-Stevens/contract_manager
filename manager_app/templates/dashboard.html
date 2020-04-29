@@ -47,6 +47,12 @@
       .archive_header {
         margin-top: 10px;
       }
+
+      #map {
+        height: 400px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+        margin-bottom: 10px;
+       }
     </style>
 
   </head>
@@ -127,7 +133,17 @@
                   <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
                   <td>{{contract.status}}</td>
                   <td>         
-                    <a href="#">Track</a>&nbsp|
+                    <!-- <a href="#">Track</a>&nbsp| -->
+                    <a href="" class="track_contract_link" 
+                      data-toggle="modal" 
+                      data-contract-id="{{contract.id}}" 
+                      data-contract-start-address="{{contract.route.start.street}} {{contract.route.start.city}}, {{contract.route.start.state}} {{contract.route.start.zip_code}}" 
+                      data-contract-end-address="{{contract.route.end.street}} {{contract.route.end.city}}, {{contract.route.end.state}} {{contract.route.end.zip_code}}"
+                      data-contract-start-time="{{contract.pick_up_time|date:'g:i A, M d, yy'}}"
+                      data-contract-end-time="{{contract.delivery_time|date:'g:i A, M d, yy'}}" 
+                      data-target="#track_modal">
+                    Track
+                    </a>&nbsp|
                     <a href="" class="archive_contract_link" data-toggle="modal" data-contract-id="{{contract.id}}" data-target="#archive_modal">Archive</a>
                   </td>
                 </tr>
@@ -1114,6 +1130,42 @@
                 </div>
               </div>
 
+              <!-- Modal for Tracking a Contract -->
+              <div class="modal fade" id="track_modal" tabindex="-1" role="dialog" aria-labelledby="trackModal" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3 class="modal-title" id="trackModal">Track Contract Status</h3>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div id="map"></div>
+                      <div class="row">
+                        <div class="col-12 pickup_details text-left">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 delivery_details text-left">
+                        </div>
+                      <!-- <p>Scheduled for delivery on </p> -->
+                      </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                      <div class="row">
+                        <div class="col-12 text-right">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>                    
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
   </div>
 
   
@@ -1230,6 +1282,58 @@
 
 
     </script>
+
+      <script>
+        function initMap() {
+          var directionsService = new google.maps.DirectionsService();
+          var directionsRenderer = new google.maps.DirectionsRenderer();
+          var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 7,
+            center: {lat: 47.60, lng: 122.33}
+          });
+          directionsRenderer.setMap(map);
+
+          $(".track_contract_link").on("click",function(){
+            var contract_id = $(this).attr("data-contract-id")
+            var start_address = $(this).attr("data-contract-start-address")
+            var end_address = $(this).attr("data-contract-end-address")
+            var start_time = $(this).attr("data-contract-start-time")
+            var end_time = $(this).attr("data-contract-end-time")
+            console.log(contract_id)
+            console.log(start_address)
+            console.log(end_address)
+            console.log(start_time)
+            console.log(end_time)
+
+            $(".pickup_details").html(`<p>Pickup by ${start_time} at ${start_address}</p>`)
+            $(".delivery_details").html(`<p>Scheduled for delivery ${end_time} at ${end_address}</p>`)
+
+            calculateAndDisplayRoute(directionsService, directionsRenderer, start_address, end_address);
+          })
+
+        }
+  
+        function calculateAndDisplayRoute(directionsService, directionsRenderer, start_address, end_address) {
+          directionsService.route(
+              {
+                origin: {query: start_address},
+                destination: {query: end_address},
+                travelMode: 'DRIVING'
+              },
+              function(response, status) {
+                if (status === 'OK') {
+                  directionsRenderer.setDirections(response);
+                } else {
+                  window.alert('Directions request failed due to ' + status);
+                }
+              });
+        }
+      </script>
+
+      <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD50WCx0L5nGIaE10lM-eY3fKFzR1_4YF8
+      &callback=initMap">
+      </script>
 
   </body>
 </html>
