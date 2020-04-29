@@ -97,6 +97,9 @@
           <li class="nav-item">
             <a class="nav-link" id="contact-tab" data-toggle="tab" href="#customers" role="tab" aria-controls="customers" aria-selected="false">Customers</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" id="archive-tab" data-toggle="tab" href="#archive" role="tab" aria-controls="archive" aria-selected="false">Archive</a>
+          </li>
         </ul>
 
         <div class="tab-content" id="myTabContent">
@@ -111,6 +114,7 @@
                   <th>Customer</th>
                   <th>Deliver By</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,6 +125,10 @@
                   <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
                   <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
                   <td>{{contract.status}}</td>
+                  <td>         
+                    <a href="#">Track</a>&nbsp|
+                    <a href="#">Archive</a>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -180,6 +188,35 @@
             </table>
           </div>
         
+          <!-- Archive Table -->
+          <div class="tab-pane fade" id="archive" role="tabpanel" aria-labelledby="archive-tab">
+            <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="archive_datatable">
+              <thead class ="thead-light">
+                <tr>
+                  <th>Contract Id</th>
+                  <th>Carrier</th>
+                  <th>Customer</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for contract in archived_contracts %}
+                <tr>
+                  <td><a href="/dashboard/contract/{{ contract.id }}">{{contract.id}}</a></td>
+                  <td><a href="/dashboard/carrier/{{ contract.carrier.id }}">{{contract.carrier.name}}</a></td>
+                  <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
+                  <td>{{contract.status}}</td>
+                  <td>
+                    <a href="#">Restore</a>&nbsp|
+                    <a href="#">Delete</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
         </div>
 
               <!-- Modal for Creating a Carrier -->
@@ -780,6 +817,7 @@
         $("#contracts_datatable").DataTable();
         $("#carriers_datatable").DataTable();
         $("#customers_datatable").DataTable();
+        $("#archive_datatable").DataTable();
       });
     </script>
 
