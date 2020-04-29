@@ -15,12 +15,4 @@ urlpatterns = [
     path("/contract/<int:contract_id>", views.contract),
         # GET -> render contract.html
 
-
-
-    ########## Kevin's page ##############
-    path('/update_carrier', views.update_carrier),
-    path('/delete_carrier/<int:carrier_id>', views.delete_carrier),
-    path('/update_carrier_phone', views.update_carrier_phone),
-    ######################################
-
 ]

@@ -7,10 +7,23 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
     <title>Carrier Page</title>
+
+    <style>
+    .top_row {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .table_nav {
+        margin-bottom: 5px;
+    }
+    </style>
+
 </head>
 
-<body>
 
+<body>
+<!-- nav bar -->
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <a class="navbar-brand" href="/">Contract Manager</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,86 +41,307 @@
         </div>
     </nav>
 
-    <div class='container' id=info>
-        <h3>Carrier Information</h3>
-        <h4><strong>Carrier Name:</strong> {{ carrier.name }} </h4>
-                                {% for x in carrier.phone_numbers.all %}
-        <h4><strong>Phone:</strong> {{ x.number }} - {{ x.number_type }}</h4> 
-                                                {% endfor %}
-        <h4><strong>Email:</strong> {{ carrier.email }}</h4>
-        <h4><strong>Carrier Website:</strong> {{ carrier.website}}</h4>
-        <h4><strong>Open Contracts:</strong> {{ open_count }}</h4>
-        <h4><strong>Completed Contracts:</strong> {{ closed_count }}</h4>              
-        <h4><strong>Partner since:</strong> {{ carrier.created_at.date }} </h4>
-        <h4><strong>Last updated:</strong> {{ carrier.updated_at }}</h4>
-    </div>
 
-    <div class="container" id='comment_box'>
-        <h4 id='title'>All Carrier Comments</h4>
-        <ul id='list'>
-            {% for x in carrier.comments.all %}
-            <li>{{ x.content }} - {{ x.created_at }} - {{ x.user.first_name }}</li>
-            {% endfor %}
-        </ul>
+<!-- Container -->
+<div class="container">
+  <div class="row top_row">
+    <div class="col-12 text-center">
+      <h1>{{carrier.name}}</h1>
     </div>
-
-    <form action="/dashboard/delete_carrier/{{ carrier.id }}">
-        <button id='delete'>Delete Carrier</button>
+  </div>
+  <div class="col-12 text-center">
+    <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_carrier">Update Carrier</button>
+    <form action="/dashboard/carrier/{{carrier.id}}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="hiddenkey" value = "delete">
+      <button class="btn btn-outline-secondary btn-sm">Delete Carrier</button>
     </form>
+  </div>
+  <div class="row">
+    <div class ="col-12 table_nav">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Phone Numbers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contracts-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="false">Contracts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="false">Comments</a>
+        </li>
+      </ul>
 
-    <hr>
-    <div class='container' id=update>
-        <h3>Update Carrier Info</h3>
-        <form action="/dashboard/update_carrier" method="POST">
+
+      <div class="tab-content" id="myTabContent">
+        <!-- Details  -->
+        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+          <h5><strong>Partner since:</strong> {{carrier.created_at.date}}</h5>
+          <h5><strong>Last edited:</strong> {{carrier.updated_at}}</h5>
+          <h5><strong>Email:</strong> {{carrier.email}}</h5>
+          <h5><strong>Website:</strong> {{carrier.website}}</h5>
+          <h5><strong>Address:</strong> {{carrier.address.street}}, {{carrier.address.city}} {{carrier.address.state}} {{carrier.address.zip_code}}</h5>
+        </div>
+
+
+        <!-- Contact -->
+        <div class="tab-pane fade table-header" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+          <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contacts_datatable">
+            <thead class = "thead-light">
+              <tr>
+                <th>Type of Phone</th>
+                <th>Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for number in carrier.phone_numbers.all %}
+              <tr>
+                <td>{{number.number_type}}</td>
+                <td>{{number.number}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_phone_number">Add Phone Number</button>
+        </div>
+
+
+        <!-- Contracts -->
+        <div class="tab-pane fade table-header" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
+          <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contracts_datatable">
+            <thead class = "thead-light">
+              <tr>
+                <th>Contract Id</th>
+                <th>Carrier</th>
+                <th>Deliver By</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contract in carrier.contracts.all %}
+              <tr>
+                <td><a href="/dashboard/contract/{{customer.id}}">{{contract.id}}</a></td>
+                <td><a href="/dashboard/customer/{{contract.customer.id}}">{{contract.customer.name}}</a></td>
+                <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
+                <td>{{contract.status}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+
+    <!-- Modal for Updating a Carrier-->
+    <div class="modal fade text-left" id="edit_carrier" tabindex="-1" role="dialog" aria-labelledby="edit_carrier_modal" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="edit_carrier_modal">Edit Carrier</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form enctype="multipart/form-data" action="/dashboard/carrier/{{carrier.id}}" method="post" id="edit_carrier_form">
             {% csrf_token %}
-            <input type="hidden" name="carrier_id" value='{{ carrier.id }}'>
-            <label for="name">Name:</label>
-            <input type="text" name='name' placeholder='{{ carrier.name }}'> 
-            <br>
-            <label for="email">Email:</label>
-            <input type="text" name='email' placeholder='{{ carrier.email }}'>
-            <br>
-            <label for="website">Website:</label>
-            <input type="text" name='website' placeholder='{{ carrier.website }}'>
-            <br>
-            <label for="comment">Add Comment:</label>                                    
-            <input type="text" name='comment'>
-            <br>
-            <label for="add_number">Add New Phone:</label>
-            <input type="text" name='new_phone'> 
-            <label for="new_type">Phone Type:</label>
-            <select name="new_type">
-                <option value="office">Office</option>
-                <option value="cell">Cell</option>
-                <option value="home">Home</option>
-                <option value="personal">Personal</option>
-                <option value="work">Work</option>
-            </select>
-            <button>Update</button> <br>
-        </form>
+            <input type="hidden" name="hiddenkey" value="update">
+            <div class="form-group row">
+              <div class="col-6">
+                <label>Carrier Name:</label>
+                <input type="text" name="name" class="form-control" value="{{carrier.name}}">
+              </div>
+              <div class="col-6">
+                <label>Website:</label>
+                <input type="text" name="website" class="form-control" value="{{carrier.website}}">
+              </div>  
+            </div>  
 
 
-        {% for x in carrier.phone_numbers.all %}
-        <form action="/dashboard/update_carrier_phone" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="carrier_id" value='{{ carrier.id }}'>
-            <input type="hidden" name="phone_id" value='{{ x.id }}'>
-            <label for="phonenumber">Update Phone:</label>
-            <input type="text" name= 'phonenumber' placeholder='{{ x.number }}'>                                                 
-            <label for="phone_type">Phone Type:</label>
-            <select name="phone_type">
-                <option value="office">Office</option>
-                <option value="cell">Cell</option>
-                <option value="home">Home</option>
-                <option value="personal">Personal</option>
-                <option value="work">Work</option>
-            </select> 
-            <button>Save</button>
-            <button>Delete</button>
-        </form>
-        {% endfor %}
+              <!-- Address Content -->
+            <div class="form-group row">
+              <div class="col-5">
+                <label>Street Address:</label>
+                <input type="text" name="street" class="form-control" value="{{carrier.address.street}}">
+              </div>
+              <div class="col-3">
+                <label>City:</label>
+                <input type="text" name="city" class="form-control" value="{{carrier.address.city}}">
+              </div>
+              <div class="col-2">
+                <label>State:</label>
+                <select class="form-control" id="state" name="state">
+                  <option value="{{carrier.address.state}}">{{carrier.address.state}}</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AL">Alabama</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DC">District of Columbia</option>
+                  <option value="DE">Delaware</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="IA">Iowa</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MD">Maryland</option>
+                  <option value="ME">Maine</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MT">Montana</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NY">New York</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="PR">Puerto Rico</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VA">Virginia</option>
+                  <option value="VT">Vermont</option>
+                  <option value="WA">Washington</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <label>Zip Code:</label>
+                <input type="text" name="zip_code" class="form-control" value = "{{carrier.address.zip_code}}">
+              </div>
+            </div>
+
+
+              <!-- Contact Information -->
+            <div class="form-group row">
+              <div class="col-6">
+                <label>Email Address:</label>
+                <input type="text" name="email" class="form-control" value = "{{carrier.email}}">
+              </div>  
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+              <button class="btn btn-primary btn-md" id="edit_carrier_button">Edit Carrier</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
+
+    <!-- Modal for Creating a Carrier -->
+    <div class="modal fade text-left" id="add_comment" tabindex="-1" role="dialog" aria-labelledby="add_comment_modal" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="add_comment_modal">Add a Comment</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form enctype="multipart/form-data" action="/dashboard/carrier/{{carrier.id}}" method="post" id="edit_comment_form">
+            {% csrf_token %}
+            <input type="hidden" name="hiddenkey" value= "comment">
+            <input type="hidden" name="carrier_id" value='{{carrier.id}}'>
+            <div class="form-group row">
+              <div class="col-12">
+                <label>Comments:</label>
+                <textarea class="form-control modal_comments" name="comments"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+              <button class="btn btn-primary btn-md" id="add_comment_button">Add Comment</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+          <!-- Modal for Creating a Phone Number -->
+      <div class="modal fade text-left" id="add_phone_number" tabindex="-1" role="dialog" aria-labelledby="add_phone_modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="add_number_modal">Add a Phone Number</h3>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form enctype="multipart/form-data" action="/dashboard/carrier/{{carrier.id}}" method="post" id="new_phone_form">
+                {% csrf_token %}
+                <input type="hidden" name="carrier_id" value='{{carrier.id}}'>
+                <input type="hidden" name="hiddenkey" value= "new_phone">
+                <div class="col-12">
+                  <label for="phone_type">Type of Phone</label>
+                  <input type="text" name="new_type" class="form_control">
+                  <label for="phone_number">Phone Number</label>
+                  <input type="text" name="new_phone" class="form_control">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                  <button class="btn btn-primary btn-md" id="add_number_button">Add a Number</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Comments -->
+      <div class="tab-pane fade table-header" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+        <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="comments_datatable">
+          <thead class = "thead-light">
+            <tr>
+              <th>User</th>
+              <th>Date</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for comment in carrier.comments.all %}
+            <tr>
+              <td>{{comment.user.first_name}} {{comment.user.last_name}}</td>
+              <td>{{comment.created_at}}</td>
+              <td>{{comment.content}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_comment">Add Comment</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 
 
     <!-- jQuery -->
@@ -119,54 +353,6 @@
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
 
-    <style>
-
-        #info{
-            margin-top: 50px;
-            margin-left: 100px;
-            display: inline-block;
-            width: 500px;
-        }
-    
-        #update{
-            margin-top: 20px;
-            margin-left: 100px;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-    
-        h3{
-            text-decoration: underline;
-            margin-bottom: 40px;
-        }
-    
-        #title{
-            display: inline-block;
-            margin-left: 20px;
-        }
-    
-        #comment_box{
-            display: inline-block;
-            vertical-align: top;
-            width: 40%;
-            margin-top: 300px;
-            margin-left: 50px;
-        }
-    
-        #list{
-            border: 1px solid black;
-            height: 150px;
-            width: 80%;
-            overflow: auto;
-        }
-    
-        #delete{
-            margin-left: 1500px;
-            background-color: red;
-            color: white;
-        }
-    
-        </style>
         
 </body>
 
