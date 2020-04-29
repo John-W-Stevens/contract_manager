@@ -12,6 +12,7 @@ class Address(models.Model):
 # route = Route added
 
 class Carrier(models.Model):
+    archived= models.BooleanField(default=False)
     name= models.CharField(max_length=255)
     website= models.CharField(max_length=255, null=True)
     address=models.OneToOneField(Address, related_name="carrier_address", on_delete=models.CASCADE, null=True)
@@ -24,6 +25,7 @@ class Carrier(models.Model):
 # comments = Comments added
 
 class Customer(models.Model):
+    archived= models.BooleanField(default=False)
     name= models.CharField(max_length=255)
     website= models.CharField(max_length=255)
     address=models.OneToOneField(Address, related_name="customer_address", on_delete=models.CASCADE, null=True)
@@ -34,6 +36,7 @@ class Customer(models.Model):
     updated_at= models.DateTimeField(auto_now=True)
 
 class Contract(models.Model):
+    archived= models.BooleanField(default=False)
     status= models.CharField(max_length=255)
     carrier_cost= models.DecimalField(decimal_places= 2, max_digits=8,  null=True)
     customer_price= models.DecimalField(decimal_places= 2,max_digits=8, null=True)

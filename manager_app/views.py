@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from . import models
 from login_app.models import User
-from .models import Customer, Comment
+from .models import Customer, Comment, Contract
 # Create your views here.
 
 ##### DEVELOPMENT ######
@@ -146,6 +146,10 @@ def index(request):
             )
             customer = models.Customer.objects.filter(name=request.POST["customer"])[0]
             carrier = models.Carrier.objects.filter(name=request.POST["carrier"])[0]
+            customer.open_contracts += 1
+            carrier.open_contracts += 1
+            customer.save()
+            carrier.save()
             contract = models.Contract.objects.create(
                 status = request.POST["status"],
                 customer = customer,
@@ -210,7 +214,6 @@ def customer(request, customer_id):
             # if len(errors) > 0:
             #     request.session["errors"] = errors
             #     return redirect(f"/dashboard/customer/{customer_id}")
-            print(request.POST)
             customer_to_change = Customer.objects.get(id=customer_id)
             customer_to_change.name = request.POST["name"]
             customer_to_change.website = request.POST["website"]
@@ -227,6 +230,9 @@ def customer(request, customer_id):
             # customer_to_delete.delete()
             # return redirect("/dashboard")
             print(customer_to_delete)
+            return redirect(f"/dashboard/customer/{customer_id}")
+        elif request.POST['hiddenkey'] == 'new_number':
+            print(request.POST)
             return redirect(f"/dashboard/customer/{customer_id}")
             
     # No POST data

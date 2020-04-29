@@ -9,11 +9,13 @@
     {% load static %}
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="{% static 'dataTables.bootstrap4.min.css' %}">
 
     <!-- Custom CSS stylesheet-->
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
 
-    <title>Dashboard</title>
+    <title>{{customer.name}}</title>
 
     <style>
       .top_row {
@@ -30,7 +32,7 @@
 
   <body>
   <!-- Navbar -->
-     <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
       <a class="navbar-brand" href="/">Contract Manager</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -49,71 +51,114 @@
   
     <!-- Container -->
     <div class="container">
-        <h1>{{customer.name}}</h1>
-        <p>Customer since: {{customer.created_at}}</p>
-        <p>Last edited: {{customer.updated_at}}</p>
+      <div class="row top_row">
+        <div class="col-12 text-center">
+          <h1>{{customer.name}}</h1>
+        </div>
+      </div>
+      <div class="col-12 text-center">
         <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_customer">Update Customer</button>
         <form action="/dashboard/customer/{{customer.id}}" method="post">
           {% csrf_token %}
           <input type="hidden" name="hiddenkey" value = "delete">
           <button class="btn btn-outline-secondary btn-sm">Delete Customer</button>
         </form>
-        <h4>Email: {{customer.email}}</h4>
-        <h4>Website: {{customer.website}}</h4>
-        <h4>Address: {{customer.address.street}}, {{customer.address.city}} {{customer.address.state}} {{customer.address.zip_code}}</h4>
-        <div class="contact">
-          <table>
-            <tr>
-              <th>Type of Phone:</th>
-              <th>Number:</th>
-            </tr>
-            {% for number in customer.phone_numbers.all %}
-            <tr>
-              <td>{{number.number_type}}</td>
-              <td>{{number.number}}</td>
-            </tr>
-            {% endfor %}
-          </table>
+      </div>
+      <div class="row">
+        <div class ="col-12 table_nav">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Phone Numbers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="contracts-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="false">Contracts</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="false">Comments</a>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="myTabContent">
+            <!-- Details  -->
+            <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+              <h5>Customer since: {{customer.created_at}}</h5>
+              <h5>Last edited: {{customer.updated_at}}</h5>
+              <h5>Email: {{customer.email}}</h5>
+              <h5>Website: {{customer.website}}</h5>
+              <h5>Address: {{customer.address.street}}, {{customer.address.city}} {{customer.address.state}} {{customer.address.zip_code}}</h5>
+            </div>
+            <!-- Contact -->
+            <div class="tab-pane fade table-header" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+              <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contacts_datatable">
+                <thead class = "thead-light">
+                  <tr>
+                    <th>Type of Phone</th>
+                    <th>Number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for number in customer.phone_numbers.all %}
+                  <tr>
+                    <td>{{number.number_type}}</td>
+                    <td>{{number.number}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_phone_number">Add Phone Number</button>
+            </div>
+            <!-- Contracts -->
+            <div class="tab-pane fade table-header" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
+              <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contracts_datatable">
+                <thead class = "thead-light">
+                  <tr>
+                    <th>Contract Id</th>
+                    <th>Carrier</th>
+                    <th>Deliver By</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for contract in customer.contracts.all %}
+                  <tr>
+                    <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
+                    <td><a href="/dashboard/carrier/{{contract.carrier.id}}">{{contract.carrier.name}}</a></td>
+                    <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
+                    <td>{{contract.status}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <!-- Comments -->
+            <div class="tab-pane fade table-header" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+              <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="comments_datatable">
+                <thead class = "thead-light">
+                  <tr>
+                    <th>User</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for comment in customer.comments.all %}
+                  <tr>
+                    <td>{{comment.user.first_name}} {{comment.user.last_name}}</td>
+                    <td>{{comment.created_at}}</td>
+                    <td>{{comment.content}}</td>
+                  </tr>
+                  <!-- <p>On {{comment.created_at}}, {{comment.user.first_name}} {{comment.user.last_name}} said: {{comment.content}}</p> -->
+                  {% endfor %}
+                </tbody>
+              </table>
+              <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_comment">Add Comment</button>
+            </div>
+          </div>
         </div>
-        <h3>Contracts:</h3>
-        <table>
-          <tr>
-            <th>Contract ID:</th>
-            <th>Status:</th>
-            <!-- Contract status = open, closed, canceled -->
-          </tr>
-          {% for contract in customer.contracts.all %}
-            {% if contract.status == "open" %}
-            <tr>
-              <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
-              <td>{{contract.status}}</td>
-            </tr>
-            {% endif %}
-          {% endfor %}
-          {% for contract in customer.contracts.all %}
-            {% if contract.status == "closed" %}
-            <tr>
-              <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
-              <td>{{contract.status}}</td>
-            </tr>
-            {% endif %}
-          {% endfor %}
-          {% for contract in customer.contracts.all %}
-            {% if contract.status == "canceled" %}
-            <tr>
-              <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
-              <td>{{contract.status}}</td>
-            </tr>
-            {% endif %}
-          {% endfor %}
-        </table>
-        <div class="commentbox">
-          <h3>Comments:</h3>
-          {% for comment in customer.comments.all reversed %}
-          <p>On {{comment.created_at}}, {{comment.user.first_name}} {{comment.user.last_name}} said: {{comment.content}}</p>
-          {% endfor %}
-          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_comment">Add Comment</button>
-        </div>
+      </div>
     </div>
     <!-- Modal for Updating a Customer -->
     <div class="modal fade text-left" id="edit_customer" tabindex="-1" role="dialog" aria-labelledby="edit_customer_modal" aria-hidden="true">
@@ -258,6 +303,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal for Creating a Phone Number -->
+    <div class="modal fade text-left" id="add_phone_number" tabindex="-1" role="dialog" aria-labelledby="add_phone_modal" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="add_number_modal">Add a Phone Number</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form enctype="multipart/form-data" action="/dashboard/customer/{{customer.id}}" method="post" id="new_phone_form">
+              {% csrf_token %}
+              <input type="hidden" name="hiddenkey" value= "new_number">
+              <div class="col-12">
+                <label for="phone_type">Type of Phone</label>
+                <input type="text" name="phone_type" class="form_control">
+                <label for="phone_number">Phone Number</label>
+                <input type="text" name="phone_number" class="form_control">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+            <button class="btn btn-primary btn-md" id="add_number_button">Add a Number</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 
@@ -266,9 +341,20 @@
       
     <!-- bootstrap.js-->
     <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
-
+    <script src="{% static 'jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'dataTables.bootstrap4.min.js' %}"></script>
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
+    <script>
+      $(document).ready(function() {
+        $("#contracts_datatable").DataTable();
+        $("#comments_datatable").DataTable();
+        $("#phones_datatable").DataTable();
+      });
+    </script>
 
+    <script>
+      $("#example_filter").addClass("text-right")
+    </script>
   </body>
 </html>

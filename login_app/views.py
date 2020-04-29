@@ -74,6 +74,8 @@ def index(request):
     GET -> gets home page
     """
     initialize_session(request)
+    if request.session['user_id'] != None:
+        return redirect("/dashboard")
     context = get_context(request, index=True)    
     return render(request, "index.html", context)
 # GET -> get home page
