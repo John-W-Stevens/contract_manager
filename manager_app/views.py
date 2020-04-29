@@ -232,17 +232,84 @@ def index(request):
         except KeyError:
             pass
 
-        # return redirect("/dashboard")
-    
-    
+        # archive/restore/delete -> Carrier
+        try:
+            request.POST["archive_carrier"]
+            carrier = models.Carrier.objects.filter(id=int(request.POST["archive_carrier_id"]))[0]
+            carrier.archived = True
+            carrier.save()
+            return redirect("/dashboard")
+        except KeyError:
+            pass
+        try:
+            request.POST["restore_carrier"]
+            carrier = models.Carrier.objects.filter(id=int(request.POST["restore_carrier_id"]))[0]
+            carrier.archived = False
+            carrier.save()
+            return redirect("/dashboard")
+        except KeyError:
+            pass
+        try:
+            request.POST["delete_carrier"]
+            carrier = models.Carrier.objects.filter(id=int(request.POST["delete_carrier_id"]))[0]
+            user_data = {
+                "email": logged_user(request).email,
+                "password": request.POST["password"]
+            }
+            errors = User.objects.login_validations(user_data)
+            if len(errors) > 0:
+                print("Invalid Password")
+                return redirect("/dashboard")
+            else:
+                carrier.delete()
+                return redirect("/dashboard")
+        except KeyError:
+            pass
+
+        # archive/restore/delete -> Customer
+        try:
+            request.POST["archive_customer"]
+            customer = models.Customer.objects.filter(id=int(request.POST["archive_customer_id"]))[0]
+            customer.archived = True
+            customer.save()
+            return redirect("/dashboard")
+        except KeyError:
+            pass
+        try:
+            request.POST["restore_customer"]
+            customer = models.Customer.objects.filter(id=int(request.POST["restore_customer_id"]))[0]
+            customer.archived = False
+            customer.save()
+            return redirect("/dashboard")
+        except KeyError:
+            pass
+        try:
+            request.POST["delete_customer"]
+            customer = models.Customer.objects.filter(id=int(request.POST["delete_customer_id"]))[0]
+            user_data = {
+                "email": logged_user(request).email,
+                "password": request.POST["password"]
+            }
+            errors = User.objects.login_validations(user_data)
+            if len(errors) > 0:
+                print("Invalid Password")
+                return redirect("/dashboard")
+            else:
+                customer.delete()
+                return redirect("/dashboard")
+        except KeyError:
+            pass
+
     # GET Request -> Render dashboard.html
     else:
         context = {
             "user": logged_user(request),
-            "carriers": models.Carrier.objects.all(),
-            "customers": models.Customer.objects.all(),
+            "carriers": models.Carrier.objects.filter(archived=False),
+            "customers": models.Customer.objects.filter(archived=False),
             "contracts": models.Contract.objects.filter(archived=False),
-            "archived_contracts": models.Contract.objects.filter(archived=True)
+            "archived_contracts": models.Contract.objects.filter(archived=True),
+            "archived_carriers": models.Carrier.objects.filter(archived=True),
+            "archived_customers": models.Customer.objects.filter(archived=True)
         }
         
         return render(request, "dashboard.html", context)
