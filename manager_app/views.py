@@ -148,13 +148,13 @@ def index(request):
             carriers = models.Carrier.objects.filter(name=request.POST["carrier"])
             
             if customers:
-                customer = customers[1]
+                customer = customers[0]
                 customer.open_contracts += 1
                 customer.save()
             else:
                 customer = None
             if carriers:
-                carrier = carriers[1]
+                carrier = carriers[0]
                 carrier.open_contracts += 1
                 carrier.save()
             else:
