@@ -346,7 +346,10 @@ def customer(request, customer_id):
             return redirect(f"/dashboard/customer/{customer_id}")
         elif request.POST['hiddenkey'] == 'archive':
             customer_to_archive=Customer.objects.get(id=customer_id)
-            customer_to_archive.archived = True
+            if customer_to_archive.archived == True:
+                customer_to_archive.archived = False
+            else:
+                customer_to_archive.archived = True
             customer_to_archive.save()
             return redirect("/dashboard")
         elif request.POST['hiddenkey'] == 'new_number':
