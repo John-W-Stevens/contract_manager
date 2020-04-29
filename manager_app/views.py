@@ -407,15 +407,28 @@ def carrier(request, carrier_id):
             carrier_to_change.save()
             carrier_to_change.address.save()
             return redirect(f"/dashboard/carrier/{carrier_id}")
-        elif request.POST['hiddenkey'] == 'delete':
-            carrier_to_delete = models.Carrier.objects.get(id=carrier_id)
-            carrier_to_delete.delete()
-            return redirect("/dashboard")
-            # return redirect(f"/dashboard/carrier/{carrier_id}")
         elif request.POST['hiddenkey'] == 'new_phone':
             models.PhoneNumber.objects.create(number=request.POST['new_phone'], number_type=request.POST['new_type'],carrier=models.Carrier.objects.get(id=request.POST['carrier_id']))
             return redirect(f"/dashboard/carrier/{carrier_id}")
-            
+        elif request.POST['hiddenkey'] == 'archive':
+            carrier_to_archive= models.Carrier.objects.get(id=carrier_id)
+            if carrier_to_archive.archived == True:
+                carrier_to_archive.archived = False
+            else:
+                carrier_to_archive.archived = True
+            carrier_to_archive.save()
+            return redirect("/dashboard")
+        elif request.POST['hiddenkey'] == 'delete':
+            phone = models.PhoneNumber.objects.get(id=request.POST['phone_id'])
+            phone.delete()
+            return redirect(f"/dashboard/carrier/{carrier_id}")
+        elif request.POST['hiddenkey'] == 'update_phone':
+            phone_to_edit = models.PhoneNumber.objects.get(id=request.POST['number_id'])
+            phone_to_edit.number = request.POST['update_phone']
+            phone_to_edit.number_type = request.POST['update_type']
+            phone_to_edit.save()
+            return redirect(f"/dashboard/carrier/{carrier_id}")
+
     # No POST data
     else:
         context = {
@@ -423,6 +436,7 @@ def carrier(request, carrier_id):
             "user": logged_user(request)
         }
         return render(request, "carrier.html", context)
+
 
         ##################################################################################################
 
