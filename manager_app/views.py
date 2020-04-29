@@ -454,7 +454,7 @@ def edit_contract(request, contract_id):
     # contract.customer=customer
     contract.carrier_cost=request.POST['carrier_cost']
     contract.customer_price=request.POST['customer_price']
-    contract.pick_up_time=format_datetime_input(request.POST["pickup_date"]) + " " + str(request.POST["pickup_time"])pick_up_time
+    contract.pick_up_time=format_datetime_input(request.POST["pickup_date"]) + " " + str(request.POST["pickup_time"])
     contract.delivery_time= format_datetime_input(request.POST["delivery_date"]) + " " + str(request.POST["delivery_time"])
     contract.route.start.street=request.POST['pickup_street_address']
     contract.route.start.city=request.POST['pickup_city']
