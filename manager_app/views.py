@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from . import models
 from login_app.models import User
-from .models import Customer, Comment, Contract
+from .models import Customer, Comment, Contract, PhoneNumber
 # Create your views here.
 
 ##### DEVELOPMENT ######
@@ -277,15 +277,29 @@ def customer(request, customer_id):
             customer_to_change.save()
             customer_to_change.address.save()
             return redirect(f"/dashboard/customer/{customer_id}")
-        elif request.POST['hiddenkey'] == 'delete':
-            customer_to_delete=Customer.objects.get(id=customer_id)
-            # customer_to_delete.delete()
-            # return redirect("/dashboard")
-            print(customer_to_delete)
-            return redirect(f"/dashboard/customer/{customer_id}")
+        elif request.POST['hiddenkey'] == 'archive':
+            customer_to_archive=Customer.objects.get(id=customer_id)
+            customer_to_archive.archived = True
+            customer_to_archive.save()
+            return redirect("/dashboard")
         elif request.POST['hiddenkey'] == 'new_number':
             print(request.POST)
+            PhoneNumber.objects.create(number_type = request.POST["phone_type"], number = request.POST["phone_number"], customer=Customer.objects.get(id=customer_id))
             return redirect(f"/dashboard/customer/{customer_id}")
+        elif request.POST['hiddenkey'] == 'delete_number':
+            phone_to_delete= PhoneNumber.objects.get(id=request.POST['phone_id'])
+            phone_to_delete.delete()
+            return redirect(f"/dashboard/customer/{customer_id}")
+        elif request.POST['hiddenkey'] == 'edit_number':
+            phone_to_edit= PhoneNumber.objects.get(id=request.POST['phone_id'])
+            phone_to_edit.number_type=request.POST['phone_type']
+            phone_to_edit.number=request.POST['phone_number']
+            phone_to_edit.save()
+            return redirect(f"/dashboard/customer/{customer_id}")
+        else:
+            print(request.POST)
+            return redirect(f"/dashboard/customer/{customer_id}")
+            
             
     # No POST data
     else:
