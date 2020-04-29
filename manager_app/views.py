@@ -190,7 +190,8 @@ def index(request):
             "user": logged_user(request),
             "carriers": models.Carrier.objects.all(),
             "customers": models.Customer.objects.all(),
-            "contracts": models.Contract.objects.all(),
+            "contracts": models.Contract.objects.filter(archived=False),
+            "archived_contracts": models.Contract.objects.filter(archived=True)
         }
         
         return render(request, "dashboard.html", context)
