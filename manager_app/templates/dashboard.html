@@ -52,6 +52,8 @@
         height: 400px;  /* The height is 400 pixels */
         width: 100%;  /* The width is the width of the web page */
         margin-bottom: 10px;
+        border: 1px solid grey;
+        border-radius: 5px;
        }
     </style>
 
@@ -136,7 +138,11 @@
                     <!-- <a href="#">Track</a>&nbsp| -->
                     <a href="" class="track_contract_link" 
                       data-toggle="modal" 
-                      data-contract-id="{{contract.id}}" 
+                      data-contract-id="{{contract.id}}"
+                      data-contract-trip-number="{{contract.trip_number}}"
+                      data-contract-status="{{contract.status}}"
+                      data-contract-carrier="{{contract.carrier.name}}"
+                      data-contract-customer="{{contract.customer.name}}" 
                       data-contract-start-address="{{contract.route.start.street}} {{contract.route.start.city}}, {{contract.route.start.state}} {{contract.route.start.zip_code}}" 
                       data-contract-end-address="{{contract.route.end.street}} {{contract.route.end.city}}, {{contract.route.end.state}} {{contract.route.end.zip_code}}"
                       data-contract-start-time="{{contract.pick_up_time|date:'g:i A, M d, yy'}}"
@@ -1137,12 +1143,14 @@
                 <div class="modal-dialog modal-lg" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h3 class="modal-title" id="trackModal">Track Contract Status</h3>
+                      <h3 class="modal-title" id="trackModal">Track Contract</h3>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
                     <div class="modal-body">
+                      <div class="map_contract_header1"></div>
+                      <div class="map_contract_header2"></div>
                       <div id="map"></div>
                       <div class="row">
                         <div class="col-12 pickup_details text-left">
@@ -1301,12 +1309,19 @@
             var end_address = $(this).attr("data-contract-end-address")
             var start_time = $(this).attr("data-contract-start-time")
             var end_time = $(this).attr("data-contract-end-time")
+            var carrier = $(this).attr("data-contract-carrier")
+            var customer = $(this).attr("data-contract-customer")
+            var status = $(this).attr("data-contract-status")
+            var trip_number = $(this).attr("data-contract-trip-number")
             console.log(contract_id)
             console.log(start_address)
             console.log(end_address)
             console.log(start_time)
             console.log(end_time)
 
+            $(".map_contract_header1").html(`<p><strong>Trip Number: </strong> ${trip_number} &nbsp&nbsp <strong>Status: </strong> ${status} &nbsp&nbsp</p>`)
+            $(".map_contract_header2").html(`<p><strong>Carrier:</strong> ${carrier} &nbsp&nbsp<strong>Customer: </strong> ${customer} &nbsp&nbsp</p>`)
+        
             $(".pickup_details").html(`<p>Pickup by ${start_time} at ${start_address}</p>`)
             $(".delivery_details").html(`<p>Scheduled for delivery ${end_time} at ${end_address}</p>`)
 
