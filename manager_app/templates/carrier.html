@@ -6,6 +6,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'dataTables.bootstrap4.min.css' %}">
     <title>Carrier Page</title>
 
     <style>
@@ -147,8 +148,8 @@
               {% for contract in carrier.contracts.all %}
               {% if contract.archived == False %}
               <tr>
-                <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
-                <td>{{contract.trip_number}}</td>
+                <td>{{contract.id}}</td>
+                <td><a href="/dashboard/contract/{{contract.id}}">{{contract.trip_number}}</a></td>
                 <td><a href="/dashboard/customer/{{contract.customer.id}}">{{contract.customer.name}}</a></td>
                 <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
                 <td>{{contract.status}}</td>
