@@ -52,6 +52,11 @@ def index(request):
         display_post(request)
         try:
             request.POST["add_carrier"]
+            if request.POST['name'] == "":
+                carrier_name = "Nameless"
+            else:
+                carrier_name = request.POST['name']
+
             carrier_address = models.Address.objects.create(
                 name=request.POST["name"],
                 street=request.POST["street_address"],
@@ -61,7 +66,7 @@ def index(request):
             )
 
             carrier = models.Carrier.objects.create(
-                name = request.POST["name"],
+                name = carrier_name,
                 website = request.POST["website"],
                 email = request.POST["email"],
                 address = carrier_address
@@ -92,6 +97,10 @@ def index(request):
 
         try:
             request.POST["add_customer"]
+            if request.POST['name'] == "":
+                customer_name = "Nameless"
+            else:
+                customer_name = request.POST['name']
             customer_address = models.Address.objects.create(
                 name=request.POST["name"],
                 street=request.POST["street_address"],
@@ -357,6 +366,10 @@ def customer(request, customer_id):
             #     request.session["errors"] = errors
             #     return redirect(f"/dashboard/customer/{customer_id}")
             customer_to_change = Customer.objects.get(id=customer_id)
+            if request.POST["name"] == "":
+                customer_to_change.name = "N/A"
+            else:
+                customer_to_change.name = request.POST["name"]
             customer_to_change.name = request.POST["name"]
             customer_to_change.website = request.POST["website"]
             customer_to_change.email = request.POST["email"]
@@ -420,6 +433,10 @@ def carrier(request, carrier_id):
             #     request.session["errors"] = errors
             #     return redirect(f"/dashboard/carrier/{carrier_id}")
             carrier_to_change = models.Carrier.objects.get(id=carrier_id)
+            if request.POST["name"] == "":
+                carrier_to_change.name = "N/A"
+            else:
+                carrier_to_change.name = request.POST["name"]
             carrier_to_change.name = request.POST["name"]
             carrier_to_change.website = request.POST["website"]
             carrier_to_change.email = request.POST["email"]
