@@ -74,7 +74,7 @@ def index(request):
             )
 
             comment = models.Comment.objects.create(
-                content = request.POST["content"],
+                content = request.POST["comments"],
                 user = logged_user(request),
                 carrier = carrier,
             )
@@ -114,7 +114,7 @@ def index(request):
             )
 
             comment = models.Comment.objects.create(
-                content = request.POST["content"],
+                content = request.POST["comments"],
                 user = logged_user(request),
                 customer = customer,
             )
