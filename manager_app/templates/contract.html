@@ -15,97 +15,126 @@
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
 </head>
 <body>
-    <div>
-        <form action='/dashboard/edit_contract/{{contract.id}}' method="POST">
-            {% csrf_token %}
-            <p>Current Routing:{{contract.route.start.name}} to {{contract.route.end.name}}</p>
-            <p>Starting Point: {{contract.route.start.street}}, {{contract.route.start.city}}</p>
-            <p>Ending Point: {{contract.route.end.street}}, {{contract.route.end.city}}</p>
-            <!-- <select name='route'>
-                {% for route in allroutes %}:
-                <option value ='{{route.id}}'>{{route.start.street}},{{route.start.city}} to {{route.end.street}},{{route.end.city}}</option>
-                {% endfor %}
-            </select> -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit_routes">
-                Edit Contract
-              </button>                       
-            <p>Carrier:{{contract.carrier.name}}</p>
-            <label for='carrier'>Carrier</label>
-            <select name='carrier' value='{{contract.carrier.name}}'>                                
-                {% for carrier in allcarriers %}:                
-                <option value ={{carrier.id}}>{{carrier.name}}</option>                
-                {% endfor %}                
-            </select>
-            <p>Customer:{{contract.customer.name}}</p>
-            <label for='customer'>Customer</label>
-            <select name='customer'>
-                {% for customer in allcustomers %}:
-                <option value ={{customer.id}}>{{customer.name}}</option>
-                {% endfor %}
-            </select><br>
-            <label display='inline-block' for='status'>Status:</label>
-            <p display='inline-block'>{{contract.status}}</p>
-            <select name='status'>
-                <option value='open'>open</option>
-                <option value='closed'>closed</option>
-                <option value='canceled'>canceled</option>
-            </select><br>
-            <label for='carrier_cost'>Carrier Cost #</label>
-            <input type='text' name='carrier_cost' value='{{contract.carrier_cost}}'>
-            <label for='customer_price'>Customer Price $</label>
-            <input type='text' name='customer_price' value='{{contract.customer_price}}'>
-            <p>Current Start:{{contract.pick_up_time}}</p>
-            <div class="row">
-                <div class="col-6">
-                  <label>Pickup Date</label>
-                  <input type="hidden" id="hidden_pickup_date" name="pickup_date">
-                  <input class="form-control" id="pickup_date" value="" type="text" placeholder="mm/dd/yyyy">
-                </div>
-                <div class="col-6">
-                    <label>Pickup Time:</label>
-                    <input id="timepicker1" class="form-control time_input" name="pickup_time">
-                </div>
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <a class="navbar-brand" href="/">Contract Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% if request.session.user_id == None %}
+          <a class="navbar-nav mr-auto nav-link disabled" href="/users"></a>
+          <a class="navbar-nav mr-lg-2 nav-link" href="/login">Signin</a>
+        {% else %}
+          <a class="navbar-nav mr-auto nav-link" href="#"></a>
+          <a class="navbar-nav mr-sm-0 nav-link" href="#">{{user.first_name}} {{user.last_name}} (admin)</a>
+          <a class="navbar-nav mr-sm-0 nav-link" href="/logout">Logoff</a>
+        {% endif %}
+        </div>
+      </nav>
+    
+      
+    <div class="container">
+        <div class="row top_row">
+          <div class="col-12 text-center">
+            <h1>{{contract.trip_number}}</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-center">
+            <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_contract">Update Contract</button>
+          </div>
+          <div class="col-12 text-center">
+            {% if contract.archived == False %}
+            <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#archive_contract">Archive Contract</button>
+            {% else %}
+            <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_contract">Restore Contract</button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div class ="col-12 table_nav">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
+              </li>
+              
+                <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="false">Comments</a>
+              </li>
+            </ul>
+  
+            <div class="tab-content" id="myTabContent">
+              <!-- Details  -->
+              <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                <h5>Contracted created: {{contract.created_at}}</h5>
+                <h5>Last edited: {{contract.updated_at}}</h5>
+                <h5>Status: {{contract.status}}</h5>
+                <h5>Carrier Cost: {{contract.carrier_cost}}</h5>
+                <h5>Customer Price:{{contract.customer_price}}</h5>
+                <h5>Customer: {{contract.customer.name}}</h5>
+                <h5>Carrier: {{contract.carrier.name}}</h5>
+                <h5>Pick Up Time: {{contract.pick_up_time}}</h5>
+                <h5>Delivery Time: {{contract.delivery_time}}</h5>                
+                <h5>Start Point: {{contract.route.start.street}}, {{contract.route.start.city}} {{contract.route.start.state}} {{contract.route.start.zip_code}}</h5>
+                <h5>End Point: {{contract.route.end.street}}, {{contract.route.end.city}} {{contract.route.end.state}} {{contract.route.end.zip_code}}</h5>
               </div>
-            <p>Current End:{{contract.delivery_time}}</p>
-            <div class="col-6">
-                <label>Delivery Date:</label>
-                <input type="hidden" id="hidden_delivery_date" name="delivery_date">
-                <input class="form-control" id="delivery_date" value="" type="text" placeholder="mm/dd/yyyy">
+              
+              
+              <!-- Comments -->
+              <div class="tab-pane fade table-header" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+                <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="comments_datatable">
+                  <thead class = "thead-light">
+                    <tr>
+                      <th>User</th>
+                      <th>Date</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for comment in comments %}
+                    <tr>
+                      <td>{{comment.user.first_name}} {{comment.user.last_name}}</td>
+                      <td>{{comment.created_at}}</td>
+                      <td>{{comment.content}}</td>
+                    </tr>
+                    <!-- <p>On {{comment.created_at}}, {{comment.user.first_name}} {{comment.user.last_name}} said: {{comment.content}}</p> -->
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#add_comment">Add Comment</button>
               </div>
-              <div class="col-6">
-                <label>Delivery Time:</label>
-                <!-- <input type="text" class="form-control" name="delivery_time" placeholder="hh:mm"> -->
-                <input id="timepicker2" class="form-control time_input" name="delivery_time">
-              </div>
-            <p>Created At:{{contract.created_at}}</p>
-            <p>Updated At:{{contract.updated_at}}</p>
-            
-            
-            <button type='submit'>Edit</button>
-            
-        </form>
+            </div>
+          </div>
+        </div>
+      </div>
+          
+
+
+
+    
 
 
     </div>
     <!-- Modal -->
-    <div class="modal fade text-left" id="edit_routes" tabindex="-1" role="dialog" aria-labelledby="edit_routes_modal" aria-hidden="true">
+    <div class="modal fade text-left" id="edit_contract" tabindex="-1" role="dialog" aria-labelledby="edit_contract_modal" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 class="modal-title" id="edit_routes_modal">Edit Contract</h3>
+              <h3 class="modal-title" id="edit_contract_modal">Edit Contract</h3>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              <form enctype="multipart/form-data" action="/dashboard/edit_contract/{{contract.id}}" method="post" id="edit_routes_form">
+              <form enctype="multipart/form-data" action="/dashboard/edit_contract/{{contract.id}}" method="POST" id="edit_contract_form">
               {% csrf_token %}
-              <input type="hidden" name="edit_routes">
+              <input type="hidden" name="edit_contract">
               <div class="form-group row">              
                     
                 <div class="col-6">
-                  <label>Contract Name:</label>
-                  <input type="text" name="contract_name" class="form-control" >
+                  <label>Trip Number:</label>
+                  <input type="text" name="trip_number" class="form-control" value='{{contract.trip_number}}' >
                 </div> -->
                 <div class="col-6">
                   <label>Status:</label>
@@ -122,7 +151,8 @@
                 <div class="col-6">
                   <label>Select Customer</label>
                   <select class="form-control" name="customer" >
-                    <option value="{{customer.id}}">{{contract.customer.name}}</option>
+                    <option value="{{contract.customer.id}}" selected>{{contract.customer.name}}</option>
+                    
                     {% for customer in allcustomers %}
                     <option value="{{customer.id}}">{{customer.name}}</option>
                     {% endfor %}
@@ -132,7 +162,7 @@
                 <div class="col-6">
                   <label>Select Carrier</label>
                   <select class="form-control" name="carrier">
-                    <option value='{{carrier.id}}'>{{contract.carrier.name}}</option>
+                    <option value="{{contract.carrier.id}}" selected>{{contract.carrier.name}}</option>
                     {% for carrier in allcarriers %}
                     <option value='{{carrier.id}}'>{{carrier.name}}</option>
                     {% endfor %}
@@ -143,11 +173,11 @@
               <div class="row contract_modal_mid_header">
                 <div class="col-6">
                   <label>Customer Price:</label>
-                  <input type="text" name="customer_price" class="form-control" value='{{contract.customer_price}}'>
+                  <input type="number" step='0.01' name="customer_price" class="form-control" value='{{contract.customer_price}}'>
                 </div>
                 <div class="col-6">
                   <label>Carrier Cost:</label>
-                  <input type="text" name="carrier_cost" class="form-control" value="{{contract.carrier_cost}}">
+                  <input type="number" step='0.01' name="carrier_cost" class="form-control" value="{{contract.carrier_cost}}">
                 </div>
               </div> -->
 
@@ -164,12 +194,12 @@
                     <div class="col-6">
                       <label>Pickup Date</label>
                       
-                      <input type="hidden" id="hidden_pickup_date" name="pickup_date">
-                      <input class="form-control" id="pickup_date" value='{{contract.pick_up_time|date:"M d, yy"}}' type="text" placeholder="mm/dd/yyyy">
+                      <input type="hidden" id="hidden_pickup_date" name="pickup_date"value='{{contract.pick_up_time}}'>
+                      <input class="form-control" id="pickup_date"  type="text" value='{{contract.pick_up_time|date:"m/d/yy"}}'>
                     </div>
                     <div class="col-6">
                         <label>Pickup Time:</label>
-                        <input id="timepicker1" class="form-control time_input" value='{{contract.pick_up_time|date:"g:i A"}}' name="pickup_time">
+                        <input id="timepicker1" class="form-control time_input" value='{{contract.pick_up_time|date:"g:i"}}' name="pickup_time">
                     </div>
                   </div>
 
@@ -260,13 +290,13 @@
                   <div class="row">
                     <div class="col-6">
                       <label>Delivery Date:</label>
-                      <input type="hidden" id="hidden_delivery_date" name="delivery_date">
-                      <input class="form-control" id="delivery_date" value='{{contract.delivery_time|date:"M d, yy"}}' type="text" placeholder="mm/dd/yyyy">
+                      <input type="hidden" id="hidden_delivery_date" name="delivery_date" value='{{contract.delivery_time}}'>
+                      <input class="form-control" id="delivery_date" value='{{contract.delivery_time|date:"m/d/yy"}}' type="text" placeholder="mm/dd/yyyy">
                     </div>
                     <div class="col-6">
                       <label>Delivery Time:</label>
                       <!-- <input type="text" class="form-control" name="delivery_time" placeholder="hh:mm"> -->
-                      <input id="timepicker2" class="form-control time_input" value='{{contract.delivery_time|date:"g:i A"}}' name="delivery_time">
+                      <input id="timepicker2" class="form-control time_input" value='{{contract.delivery_time|date:"g:i"}}' name="delivery_time">
                     </div>
                   </div>
                   <div class="row contract_modal_mid_header">
@@ -357,7 +387,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                <button class="btn btn-primary btn-md" id="edit_routes_button">Save Contract</button>
+                <button class="btn btn-primary btn-md" id="edit_contract_button">Save Contract</button>
               </form>
             </div>
           </div>
@@ -365,7 +395,69 @@
       </div>
     
     
-
+    <!-- Modal for Archiving a Contract -->
+    <div class="modal fade" id="archive_contract" tabindex="-1" role="dialog" aria-labelledby="archiveModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="achiveModal">Archive this contract?</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% if contract.archived == True %}
+            <div class="modal-body">
+              Restoring this contract will remove it from the archives and store it in the contract table. Are you sure you want to proceed?
+            </div>
+            {% else %}
+            <div class="modal-body">
+              Archiving this contract will remove it from the contracts table and store it in the archive. Are you sure you want to proceed?
+            </div>
+            {% endif %}
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <form action="/dashboard/archive_contract/{{contract.id}}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="hiddenkey" value="archive">
+              {% if contract.archived == True %}
+                <button class="btn btn-success">Restore</button>
+              {% else %}  
+                <button class="btn btn-danger">Archive</button>
+              {% endif %}
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Modal for Creating a Comment -->
+    <div class="modal fade text-left" id="add_comment" tabindex="-1" role="dialog" aria-labelledby="add_comment_modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="add_comment_modal">Add a Comment</h3>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form enctype="multipart/form-data" action="/dashboard/contract_comment/{{contract.id}}" method="post" id="edit_comment_form">
+              {% csrf_token %}
+              <input type="hidden" name="hiddenkey" value= "comment">
+              <div class="form-group row">
+                <div class="col-12">
+                  <label>Comments:</label>
+                  <textarea class="form-control modal_comments" name="comments"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                <button class="btn btn-primary btn-md" id="add_comment_button">Add Comment</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
 
