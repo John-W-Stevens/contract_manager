@@ -26,6 +26,14 @@
       .table_nav {
         margin-bottom: 5px;
       }
+
+      #update_but{
+        margin-right: -15px;
+      }
+
+      #edit_button{
+        margin-right: 5px;
+      }
     </style>
 
   </head>
@@ -65,7 +73,9 @@
               {% endif %}
             </div>
           </div>
-          <h1>{{customer.name}}</h1>
+          <div class="col-12 text-center">
+            <h1>{{customer.name}}</h1>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -88,11 +98,11 @@
           <div class="tab-content" id="myTabContent">
             <!-- Details  -->
             <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-              <h5>Customer since: {{customer.created_at}}</h5>
-              <h5>Last edited: {{customer.updated_at}}</h5>
-              <h5>Email: {{customer.email}}</h5>
-              <h5>Website: {{customer.website}}</h5>
-              <h5>Address: {{customer.address.street}}, {{customer.address.city}} {{customer.address.state}} {{customer.address.zip_code}}</h5>
+              <h5><strong>Customer since:</strong> {{customer.created_at}}</h5>
+              <h5><strong>Last edited:</strong> {{customer.updated_at}}</h5>
+              <h5><strong>Email:</strong> {{customer.email}}</h5>
+              <h5><strong>Website:</strong> {{customer.website}}</h5>
+              <h5><strong>Address:</strong> {{customer.address.street}}, {{customer.address.city}} {{customer.address.state}} {{customer.address.zip_code}}</h5>
             </div>
             <!-- Contact -->
             <div class="tab-pane fade table-header" id="contact" role="tabpanel" aria-labelledby="contact-tab">
