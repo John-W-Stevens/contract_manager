@@ -13,6 +13,16 @@
 
     <!-- Custom CSS stylesheet-->
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> -->
+    <style>
+        .top_row {
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+  
+        .table_nav {
+          margin-bottom: 5px;
+        }
+      </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -36,23 +46,24 @@
     
       
     <div class="container">
+        <div class="row">
+            <div class="col-3 offset-6 text-right">
+              <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_contract">Update Contract</button>
+            </div>
+            <div class="col-3 text-left">
+              {% if contract.archived == False %}
+              <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#archive_contract">Archive Contract</button>
+              {% else %}
+              <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_contract">Restore Contract</button>
+              {% endif %}
+            </div>
+          </div>
         <div class="row top_row">
           <div class="col-12 text-center">
             <h1>{{contract.trip_number}}</h1>
           </div>
         </div>
-        <div class="row">
-          <div class="col-12 text-center">
-            <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_contract">Update Contract</button>
-          </div>
-          <div class="col-12 text-center">
-            {% if contract.archived == False %}
-            <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#archive_contract">Archive Contract</button>
-            {% else %}
-            <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_contract">Restore Contract</button>
-            {% endif %}
-          </div>
-        </div>
+        
         <div class="row">
           <div class ="col-12 table_nav">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -135,7 +146,7 @@
                 <div class="col-6">
                   <label>Trip Number:</label>
                   <input type="text" name="trip_number" class="form-control" value='{{contract.trip_number}}' >
-                </div> -->
+                </div>
                 <div class="col-6">
                   <label>Status:</label>
                   <select class="form-control" name="status">
@@ -145,7 +156,7 @@
                     <option>canceled</option>
                   </select>
                 </div>  
-              </div> -->
+              </div>
               <!-- Select Customer and Carrier -->
               <div class="row">
                 <div class="col-6">
@@ -179,7 +190,7 @@
                   <label>Carrier Cost:</label>
                   <input type="number" step='0.01' name="carrier_cost" class="form-control" value="{{contract.carrier_cost}}">
                 </div>
-              </div> -->
+              </div>
 
               <div class="row contract_modal_mid_header">
                 <div class="col-6">
