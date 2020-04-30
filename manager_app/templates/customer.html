@@ -460,20 +460,24 @@
         $("#phones_datatable").DataTable();
       });
     </script>
+    
     <script>
       $(".phonedeletebutton").on("click", function(){
         var phoneid = $(this).attr("data-phoneid")
         $("#phoneid").val(phoneid)
       });
     </script>
+
     <script>
       $(".phoneeditbutton").on("click", function(){
         var phoneid = $(this).attr("data-phoneid")
         $("#editphoneid").val(phoneid)
       });
     </script>
+
     <script>
       $("#example_filter").addClass("text-right")
     </script>
+
   </body>
 </html>

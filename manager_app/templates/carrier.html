@@ -20,7 +20,7 @@
     }
 
     #update_but{
-      margin-right: -25px;
+      margin-right: -15px;
     }
 
     #edit_button{
@@ -64,11 +64,11 @@
     <div class="col-3 text-left">
       {% if carrier.archived == False %}
       <div >
-        <button class="btn-danger btn-sm" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_modal">Archive Carrier</button>
+        <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_modal">Archive Carrier</button>
       </div>
       {% else %}
       <div>
-        <button class="btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_modal">Restore Carrier</button>
+        <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_modal">Restore Carrier</button>
       </div>
       {% endif %}
     </div>
@@ -122,7 +122,7 @@
               <tr>
                 <td>{{number.number}}</td>
                 <td>{{number.number_type}}</td>
-                <td><button class="btn-outline-primary btn-sm edit_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_edit_modal" id='edit_button'>Edit Number</button><button class="btn-outline-danger btn-sm delete_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_delete_modal">Delete Number</button></td>
+                <td><button class="btn btn-outline-primary btn-sm edit_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_edit_modal" id='edit_button'>Edit Number</button><button class="btn btn-outline-danger btn-sm delete_this_phone" data-toggle="modal" data-phoneid="{{number.id}}" data-target="#phone_delete_modal">Delete Number</button></td>
               </tr>
               {% endfor %}
             </tbody>
@@ -137,6 +137,7 @@
             <thead class = "thead-light">
               <tr>
                 <th>Contract Id</th>
+                <th>Trip Number</th>
                 <th>Customer</th>
                 <th>Deliver By</th>
                 <th>Status</th>
@@ -144,12 +145,15 @@
             </thead>
             <tbody>
               {% for contract in carrier.contracts.all %}
+              {% if contract.archived == False %}
               <tr>
-                <td><a href="/dashboard/contract/{{customer.id}}">{{contract.id}}</a></td>
+                <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
+                <td>{{contract.trip_number}}</td>
                 <td><a href="/dashboard/customer/{{contract.customer.id}}">{{contract.customer.name}}</a></td>
                 <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
                 <td>{{contract.status}}</td>
               </tr>
+              {% endif %}
               {% endfor %}
             </tbody>
           </table>
@@ -472,6 +476,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <!-- bootstrap.js-->
     <script type="text/javascript" src="{% static 'bootstrap.js' %}"></script>
+    <script src="{% static 'jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'dataTables.bootstrap4.min.js' %}"></script>
     <!-- Custom JavaScript -->
     <!-- <script type="text/javascript" src="script.js"></script> -->
 
@@ -482,7 +488,18 @@
     })
   </script>
 
-        
+  <script>
+      $(document).ready(function() {
+        $("#contracts_datatable").DataTable();
+        $("#comments_datatable").DataTable();
+        $("#phones_datatable").DataTable();
+      });
+  </script>
+
+  <script>
+    $("#example_filter").addClass("text-right")
+  </script>
+
 </body>
 
 </html>
