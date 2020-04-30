@@ -32,6 +32,10 @@ def logged_user(request):
 ####### Helper Functions #########
 
 def index(request):
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     """
     GET -> Renders dashboard.html
     POST -> Handles the following requests:
@@ -357,6 +361,10 @@ def index(request):
 
 def customer(request, customer_id):
     # POST data
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     if request.POST:
         if request.POST['hiddenkey'] == 'comment':
             Comment.objects.create(content = request.POST["comments"], user=logged_user(request), customer= Customer.objects.get(id=customer_id))
@@ -407,6 +415,7 @@ def customer(request, customer_id):
     # No POST data
     else:
         context = {
+            "current_time": datetime.datetime.now(None),
             "customer": Customer.objects.get(id=customer_id),
             "user": logged_user(request)
         }
@@ -420,15 +429,15 @@ def customer(request, customer_id):
 
 def carrier(request, carrier_id):
     # POST data
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     if request.POST:
         if request.POST['hiddenkey'] == 'comment':
             models.Comment.objects.create(content = request.POST["comments"], user=logged_user(request), carrier= models.Carrier.objects.get(id=carrier_id))
             return redirect(f"/dashboard/carrier/{carrier_id}")
         elif request.POST['hiddenkey'] == 'update':
-            # errors=models.Carrier.objects.validation(request.POST)
-            # if len(errors) > 0:
-            #     request.session["errors"] = errors
-            #     return redirect(f"/dashboard/carrier/{carrier_id}")
             carrier_to_change = models.Carrier.objects.get(id=carrier_id)
             if request.POST["name"] == "":
                 carrier_to_change.name = "N/A"
@@ -478,8 +487,10 @@ def carrier(request, carrier_id):
         ##################################################################################################
 
 def contract(request, contract_id):
-
-    
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     contract=models.Contract.objects.get(id=contract_id)
     carriers=models.Carrier.objects.all()
     customers=models.Customer.objects.all()
@@ -500,7 +511,10 @@ def contract(request, contract_id):
     return render(request, 'contract.html',context)
 
 def edit_contract(request, contract_id):
-
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     def format_datetime_input(astring):
         output = astring.split("/")
         output.append(output[0])
@@ -558,7 +572,10 @@ def edit_contract(request, contract_id):
     return redirect('contract_detail',contract_id=contract_id)
 
 def archive_contract(request, contract_id):
-
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     if request.POST['hiddenkey'] == 'archive':
         contract=Contract.objects.get(id=contract_id)
         if contract.archived == True:
@@ -571,14 +588,13 @@ def archive_contract(request, contract_id):
         return redirect("/dashboard")
 
 def contract_comment(request, contract_id):
-
-    
-
+    if "user_id" not in request.session:
+        return redirect("/")
+    elif request.session["user_id"] == None:
+        return redirect("/")
     Comment.objects.create(
         content=request.POST['comments'],
         user=logged_user(request), 
         contract= Contract.objects.get(id=contract_id)
     )
-
-
     return redirect('contract_detail',contract_id=contract_id)
