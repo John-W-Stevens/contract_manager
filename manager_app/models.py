@@ -1,5 +1,6 @@
 from django.db import models
 from login_app.models import User
+from decimal import Decimal 
 
 class Address(models.Model):
     name= models.CharField(max_length=255)
@@ -39,8 +40,8 @@ class Contract(models.Model):
     trip_number= models.CharField(max_length=45, null=True)
     archived= models.BooleanField(default=False)
     status= models.CharField(max_length=255)
-    carrier_cost= models.DecimalField(decimal_places= 2, max_digits=8,  null=True)
-    customer_price= models.DecimalField(decimal_places= 2,max_digits=8, null=True)
+    carrier_cost= models.DecimalField(decimal_places= 2, max_digits=8,  default=Decimal(0))
+    customer_price= models.DecimalField(decimal_places= 2,max_digits=8, default=Decimal(0))
     customer = models.ForeignKey(Customer, related_name="contracts", on_delete=models.SET_NULL, blank=True, null=True)
     carrier = models.ForeignKey(Carrier, related_name="contracts", on_delete=models.SET_NULL, blank=True, null=True)
     pick_up_time= models.DateTimeField()

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from . import models
 from login_app.models import User
 from .models import Customer, Comment, Contract, PhoneNumber
+from decimal import Decimal
+import datetime
 # Create your views here.
 
 ##### DEVELOPMENT ######
@@ -160,15 +162,36 @@ def index(request):
             else:
                 carrier = None
 
-            # carrier.open_contracts += 1
+            # formats customer price and carrier cost:
+            if request.POST["customer_cost"] != "":
+                customer_price = Decimal(float(request.POST["customer_cost"]))
+            else:
+                customer_price = Decimal(0)
+            
+            if request.POST["carrier_cost"] != "":
+                carrier_cost = Decimal(float(request.POST["carrier_cost"]))
+            else:
+                carrier_cost = Decimal(0)
+
+            # format pickup_time
+
+            try:
+                pick_up_time = datetime.datetime.strptime(request.POST["pickup_date"] + " " + request.POST["pickup_time"], "%m/%d/%Y %H:%M")
+            except ValueError:
+                pick_up_time = datetime.datetime.now()
+            try:
+                delivery_date = datetime.datetime.strptime(request.POST["delivery_date"] + " " + request.POST["delivery_date"], "%Y/%m/%d %H:%M")
+            except ValueError:
+                delivery_time = datetime.datetime.now()
+
             contract = models.Contract.objects.create(
                 status = request.POST["status"],
                 customer = customer,
                 carrier = carrier,
-                customer_price = request.POST["customer_cost"],
-                carrier_cost = request.POST["carrier_cost"],
-                pick_up_time = format_datetime_input(request.POST["pickup_date"]) + " " + str(request.POST["pickup_time"]),
-                delivery_time = format_datetime_input(request.POST["delivery_date"]) + " " + str(request.POST["delivery_time"])
+                customer_price = customer_price,
+                carrier_cost = carrier_cost,
+                pick_up_time = pick_up_time,
+                delivery_time = delivery_time
             )
             comment = models.Comment.objects.create(
                 content = request.POST["comments"],
