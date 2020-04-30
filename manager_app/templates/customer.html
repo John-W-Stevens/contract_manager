@@ -109,16 +109,16 @@
               <table class="table table-sm table-hover table-striped table-bordered table-responsive-lg" id="contacts_datatable">
                 <thead class = "thead-light">
                   <tr>
-                    <th>Type of Phone</th>
                     <th>Number</th>
+                    <th>Type of Phone</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for number in customer.phone_numbers.all %}
                   <tr>
-                    <td>{{number.number_type}}</td>
                     <td>{{number.number}}</td>
+                    <td>{{number.number_type}}</td>
                     <td>
                       <button class="btn btn-outline-primary btn-sm phoneeditbutton" data-toggle="modal" data-target="#edit_phone_number" data-phoneid="{{number.id}}">Edit Number</button>
                       <button class="btn btn-outline-danger btn-sm phonedeletebutton" data-toggle="modal" data-target="#delete_number" data-phoneid="{{number.id}}">Delete Number</button>
@@ -145,8 +145,8 @@
                   {% for contract in customer.contracts.all %}
                     {% if contract.archived == False %}
                       <tr>
-                        <td><a href="/dashboard/contract/{{contract.id}}">{{contract.id}}</a></td>
-                        <td>{{contract.trip_number}}</td>
+                        <td>{{contract.id}}</td>
+                        <td><a href="/dashboard/contract/{{contract.id}}">{{contract.trip_number}}</a></td>
                         <td><a href="/dashboard/carrier/{{contract.carrier.id}}">{{contract.carrier.name}}</a></td>
                         <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
                         <td>{{contract.status}}</td>

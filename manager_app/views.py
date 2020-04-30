@@ -163,13 +163,13 @@ def index(request):
                 customer.open_contracts += 1
                 customer.save()
             else:
-                customer = None
+                customer = models.Customer.objects.first()
             if carriers:
                 carrier = carriers[0]
                 carrier.open_contracts += 1
                 carrier.save()
             else:
-                carrier = None
+                carrier = models.Carrier.objects.first()
 
             # formats customer price and carrier cost:
             if request.POST["customer_cost"] != "":
@@ -192,8 +192,13 @@ def index(request):
                 delivery_date = datetime.datetime.strptime(request.POST["delivery_date"] + " " + request.POST["delivery_date"], "%Y/%m/%d %H:%M")
             except ValueError:
                 delivery_time = datetime.datetime.now()
-
+            
+            if request.POST["contract_name"] == "":
+                trip_number="None"
+            else:
+                trip_number= request.POST["contract_name"]
             contract = models.Contract.objects.create(
+                trip_number = trip_number,
                 status = request.POST["status"],
                 customer = customer,
                 carrier = carrier,
@@ -354,14 +359,9 @@ def customer(request, customer_id):
     # POST data
     if request.POST:
         if request.POST['hiddenkey'] == 'comment':
-            # Comment validation
             Comment.objects.create(content = request.POST["comments"], user=logged_user(request), customer= Customer.objects.get(id=customer_id))
             return redirect(f"/dashboard/customer/{customer_id}")
         elif request.POST['hiddenkey'] == 'update':
-            # errors=models.Customer.objects.validation(request.POST)
-            # if len(errors) > 0:
-            #     request.session["errors"] = errors
-            #     return redirect(f"/dashboard/customer/{customer_id}")
             customer_to_change = Customer.objects.get(id=customer_id)
             if request.POST["name"] == "":
                 customer_to_change.name = "N/A"
