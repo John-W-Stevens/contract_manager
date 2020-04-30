@@ -56,26 +56,27 @@
 <!-- Container -->
 <div class="container">
   <div class="row top_row">
-  </div>
-  <div class='row'>
-
-    <div class="col-3 offset-6 text-right" id='update_but'>
-      <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_carrier">Update Carrier</button>
-    </div>
-    <div class="col-3 text-left">
-      {% if carrier.archived == False %}
-      <div >
-        <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_modal">Archive Carrier</button>
-      </div>
-      {% else %}
-      <div>
-        <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_modal">Restore Carrier</button>
-      </div>
-      {% endif %}
-    </div>
-
     <div class="col-12 text-center">
-      <h1>{{carrier.name}}</h1>
+      <div class='row'>
+        <div class="col-3 offset-6 text-right" id='update_but'>
+          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#edit_carrier">Update Carrier</button>
+        </div>
+        <div class="col-3 text-left">
+          {% if carrier.archived == False %}
+          <div >
+            <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-carrier-id="{{carrier.id}}" data-target="#archive_modal">Archive Carrier</button>
+          </div>
+          {% else %}
+          <div>
+            <button class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#archive_modal">Restore Carrier</button>
+          </div>
+          {% endif %}
+        </div>
+    
+        <div class="col-12 text-center">
+          <h1>{{carrier.name}}</h1>
+        </div>
+      </div>
     </div>
   </div>
   <!-- </div> -->
