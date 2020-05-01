@@ -27,6 +27,14 @@
         margin-bottom: 5px;
       }
 
+      .bettergetthisdeliveredtoday{
+        background-color: orange;
+      }
+
+      .overdue{
+        background-color: red;
+      }
+
       #update_but{
         margin-right: -15px;
       }
@@ -34,12 +42,7 @@
       #edit_button{
         margin-right: 5px;
       }
-
-      #overdue{
-        background-color: red;
-      }
     </style>
-
   </head>
 
   <body>
@@ -158,11 +161,13 @@
                         <td>{{constract.status}}</td>
                         {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month > current_time.month %}
                         <td>{{contract.status}}</td>
-                        {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month == current_time.month and contract.delivery_time.day >= current_time.day %}
+                        {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month == current_time.month and contract.delivery_time.day > current_time.day %}
                         <td>{{contract.status}}</td>
+                        {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month == current_time.month and contract.delivery_time.day == current_time.day and contract.status == "open" %}
+                        <td class="bettergetthisdeliveredtoday">{{contract.status}}: Due Today</td>
                         {% else %}
                         {% if contract.status == "open" %}
-                        <td id="overdue">{{contract.status}}: Past Due</td>
+                        <td class="overdue">{{contract.status}}: Past Due</td>
                         {% else %}
                         <td>{{contract.status}}</td>
                         {% endif %}

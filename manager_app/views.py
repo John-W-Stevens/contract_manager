@@ -375,7 +375,6 @@ def customer(request, customer_id):
                 customer_to_change.name = "N/A"
             else:
                 customer_to_change.name = request.POST["name"]
-            customer_to_change.name = request.POST["name"]
             customer_to_change.website = request.POST["website"]
             customer_to_change.email = request.POST["email"]
             customer_to_change.address.street = request.POST["street_address"]
@@ -414,6 +413,10 @@ def customer(request, customer_id):
             
     # No POST data
     else:
+        try:
+            customer= Customer.objects.get(id=customer_id)
+        except:
+            return redirect(f"/dashboard")
         context = {
             "current_time": datetime.datetime.now(None),
             "customer": Customer.objects.get(id=customer_id),
@@ -477,6 +480,10 @@ def carrier(request, carrier_id):
 
     # No POST data
     else:
+        try:
+            carrier= models.Carrier.objects.get(id=carrier_id)
+        except:
+            return redirect(f"/dashboard")
         context = {
             "carrier": models.Carrier.objects.get(id=carrier_id),
             "user": logged_user(request)
@@ -491,6 +498,10 @@ def contract(request, contract_id):
         return redirect("/")
     elif request.session["user_id"] == None:
         return redirect("/")
+    try:
+        contract= Contract.objects.get(id=contract_id)
+    except:
+        return redirect(f"/dashboard")
     contract=models.Contract.objects.get(id=contract_id)
     carriers=models.Carrier.objects.all()
     customers=models.Customer.objects.all()
@@ -515,6 +526,10 @@ def edit_contract(request, contract_id):
         return redirect("/")
     elif request.session["user_id"] == None:
         return redirect("/")
+    try:
+        contract= Contract.objects.get(id=contract_id)
+    except:
+        return redirect(f"/dashboard")
     def format_datetime_input(astring):
         output = astring.split("/")
         output.append(output[0])
@@ -576,6 +591,10 @@ def archive_contract(request, contract_id):
         return redirect("/")
     elif request.session["user_id"] == None:
         return redirect("/")
+    try:
+        contract= Contract.objects.get(id=contract_id)
+    except:
+        return redirect(f"/dashboard")
     if request.POST['hiddenkey'] == 'archive':
         contract=Contract.objects.get(id=contract_id)
         if contract.archived == True:
@@ -592,6 +611,10 @@ def contract_comment(request, contract_id):
         return redirect("/")
     elif request.session["user_id"] == None:
         return redirect("/")
+    try:
+        contract= Contract.objects.get(id=contract_id)
+    except:
+        return redirect(f"/dashboard")
     Comment.objects.create(
         content=request.POST['comments'],
         user=logged_user(request), 
