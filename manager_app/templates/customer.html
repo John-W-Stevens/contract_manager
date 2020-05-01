@@ -27,6 +27,10 @@
         margin-bottom: 5px;
       }
 
+      .ontime{
+        background-color: green;
+      }
+
       .bettergetthisdeliveredtoday{
         background-color: orange;
       }
@@ -156,13 +160,13 @@
                         <td>{{contract.id}}</td>
                         <td><a href="/dashboard/contract/{{contract.id}}">{{contract.trip_number}}</a></td>
                         <td><a href="/dashboard/carrier/{{contract.carrier.id}}">{{contract.carrier.name}}</a></td>
-                        <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
+                        <td>{{contract.delivery_time|date:"g:i A, M d, Y"}}</td>
                         {% if contract.delivery_time.year > current_time.year %}
-                        <td>{{constract.status}}</td>
+                        <td class="ontime">{{constract.status}}</td>
                         {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month > current_time.month %}
-                        <td>{{contract.status}}</td>
+                        <td class="ontime">{{contract.status}}</td>
                         {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month == current_time.month and contract.delivery_time.day > current_time.day %}
-                        <td>{{contract.status}}</td>
+                        <td class="ontime">{{contract.status}}</td>
                         {% elif contract.delivery_time.year == current_time.year and contract.delivery_time.month == current_time.month and contract.delivery_time.day == current_time.day and contract.status == "open" %}
                         <td class="bettergetthisdeliveredtoday">{{contract.status}}: Due Today</td>
                         {% else %}
