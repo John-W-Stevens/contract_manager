@@ -132,7 +132,7 @@
                   <td><a href="/dashboard/contract/{{ contract.id }}">{{contract.trip_number}}</a></td>
                   <td><a href="/dashboard/carrier/{{ contract.carrier.id }}">{{contract.carrier.name}}</a></td>
                   <td><a href="dashboard/customer/{{ contract.customer.id }}">{{contract.customer.name}}</a></td>
-                  <td>{{contract.delivery_time|date:"g:i A, M d, yy"}}</td>
+                  <td>{{contract.delivery_time|date:"g:i A, M d, Y"}}</td>
                   <td>{{contract.status}}</td>
                   <td>         
                     <!-- <a href="#">Track</a>&nbsp| -->
