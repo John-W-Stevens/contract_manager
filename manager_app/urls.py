@@ -17,3 +17,4 @@ urlpatterns = [
     path('/contract_comment/<int:contract_id>',views.contract_comment),
     # Make sure this re_path is the last URL in the list. It catches any routes that don't fit our other URL patterns
     re_path(r'^',views.index)
+]
