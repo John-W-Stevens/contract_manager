@@ -193,7 +193,7 @@ def index(request):
             except ValueError:
                 pick_up_time = datetime.datetime.now()
             try:
-                delivery_date = datetime.datetime.strptime(request.POST["delivery_date"] + " " + request.POST["delivery_date"], "%Y/%m/%d %H:%M")
+                delivery_time = datetime.datetime.strptime(request.POST["delivery_date"] + " " + request.POST["delivery_time"], "%m/%d/%Y %H:%M")
             except ValueError:
                 delivery_time = datetime.datetime.now()
             
