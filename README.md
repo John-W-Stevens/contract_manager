@@ -1,6 +1,8 @@
 # contract_manager
 Django Team Project
 
+Added Video Demo: https://www.youtube.com/watch?v=0Yw_jhaeoKQ
+
 Shipping application to help brokers stay organized, track, and keep notes on contracts with customers and truck carriers. 
 
 Application includes:
